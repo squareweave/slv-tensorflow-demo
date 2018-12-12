@@ -7,11 +7,12 @@ Learn more about the experiment and try it for yourself at [g.co/emojiscavengerh
 
 ## Development
 
-```sh
-yarn prep
-```
+In order to have this run on your local machine, some setup work may need to happen. Pyenv and NVM version files are included so if you 
+are using these tools that should be all you need to run the Google Cloud SDK setup instructions below.
 
-Running `yarn prep` will use yarn to get the right packages and setup the right folders. If you don't have [yarn](https://yarnpkg.com/lang/en/docs/install/) you can install it via homebrew (for Mac). If you’re already running node/npm with nvm (our recommendation) you can install yarn without node using `brew install yarn --without-node`.
+1. `yarn prep`
+
+`yarn prep` will use yarn to get the right packages and setup the right folders. If you don't have [yarn](https://yarnpkg.com/lang/en/docs/install/) you can install it via homebrew (for Mac). If you’re already running node/npm with nvm (our recommendation) you can install yarn without node using `brew install yarn --without-node`.
 
 In order to start local development we also require the installation of the [Google Cloud SDK](https://cloud.google.com/sdk/downloads) and associated [App Engine Components](https://cloud.google.com/appengine/docs/standard/python/download). These are used for the local webserver and pushing to app engine for static site hosting.
 
