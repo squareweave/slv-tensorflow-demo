@@ -32,6 +32,16 @@ yarn build
 
 This will minify SASS and JS for serving in production.
 
+### Using the webcam/https testing
+
+In chrome, the webcam should work as long as you are using localhost as your base name. However,This becomes a problem if you wish to device test as the WebRTC standard requires https!
+
+To setup the app over https we've created the guide that follows. You also won't get all the reloading nicities - you'll be running the dev server from the `dist` folder, separate from the `dev_server.py` method of development.
+
+1. Generate the app with `yarn build`
+2. Run `yarn dist:test`
+3. It should now be possible to access the app over your local network at the browser-sync outputted 'External' address in iOS safari, and have the camera work. 
+
 ## Build your own model
 You can build your own image recognition model by running a Docker container.
 Dockerfiles are in `training` directory.

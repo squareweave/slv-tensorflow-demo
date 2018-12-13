@@ -11,10 +11,13 @@
     "js-watch": "watchify src/js/index.ts -p [tsify] -o dist/js/bundle.js -v --debug",
     "js-build": "browserify src/js/index.ts -p [tsify] -o dist/js/bundle.js",
     "js-compress": "uglifyjs dist/js/bundle.js -c -m -o dist/js/bundle.js",
-    "dev:server": "dev_appserver.py --port=3000 app.yaml",
+    "dev:server": "dev_appserver.py --port=3000 --host 0.0.0.0 --enable_host_checking false app.yaml",
     "build": "concurrently \"yarn sass-build\" \"yarn js-build && yarn js-compress\"",
     "dev": "concurrently \"yarn sass-watch\" \"yarn js-watch\" \"yarn dev:server\"",
-    "lint": "tslint -p . -t verbose"
+    "lint": "tslint -p . -t verbose",
+    "dist:server": "http-server ./dist --cert ./dist/cert.pem --key ./dist/key.pem --ssl -c-1 -p 8080 -a 127.0.0.1",
+    "dist:browsersync": "browser-sync start --proxy=https://127.0.0.1:8080 --port=3001",
+    "dist:test": "concurrently \"yarn dist:server\" \"yarn dist:browsersync\""
   },
   "devDependencies": {
     "@types/lodash": "^4.14.104",
