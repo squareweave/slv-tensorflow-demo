@@ -90,9 +90,10 @@ body {
 }
 
 .play-btn {
-    background-color: #87ca72;
+    background: #87ca72 url(../img/camera.png) no-repeat 10px 50%;
+    background-size:20px 20px;
     border:2px solid #64ad4b;
-    padding: 10px 25px;
+    padding: 10px 25px 10px 40px;
     font-size: 20px;
     font-weight: bold;
     font-style: normal;
@@ -390,6 +391,17 @@ body {
     @include bp(ls) {
       margin: 0 10px 20px;
     }
+  }
+
+  &__triangle{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 830px solid #343d46;
+    border-left: 239px solid transparent;
+    z-index: -1;
   }
 
   &__desktop-msg {

@@ -25,14 +25,11 @@ import {share} from './share';
 import {getQueryParam, isIOS} from './utils';
 import {shuffle} from 'lodash';
 import * as tfc from '@tensorflow/tfjs-core';
-import {EmojiItem, EMOJIS_LVL_1} from './game_levels';
-
-export const GAME_START_TIME = 20;
-export const GAME_EXTEND_TIME = 10;
+import {ExhibitItem, OBJECTS_LVL_1} from './game_levels';
 export const GAME_MAX_ITEMS = 2;
 
 export interface EmojiLevelsLookup {
-  [index: string]: Array<EmojiItem>;
+  [index: string]: Array<ExhibitItem>;
 }
 
 interface CameraDimentions {
@@ -57,14 +54,14 @@ export class Game {
   timerAtStartOfRound: number;
   /** Timer interval so we can continually update the timer. */
   timerInterval: number;
-  emojiLvlDemo: Array<EmojiItem>;
+  emojiLvlDemo: Array<ExhibitItem>;
   /**
    * A lookup containing references to each level of emoji which can be used
    * to find the next emoji from that particular level.
    */
   emojiLvlLookup: EmojiLevelsLookup;
   /** Array of emoji items the user has found during this game instance. */
-  emojisFound: Array<EmojiItem>;
+  emojisFound: Array<ExhibitItem>;
   /**
    * A string containing the order of emojis levels we will pick randomly from
    * for each game instance. E.g '1123445' would pick one item from level 1
@@ -72,7 +69,7 @@ export class Game {
    */
   gameDifficulty: string;
   /** The current emoji to find. */
-  currentEmoji: EmojiItem;
+  currentEmoji: ExhibitItem;
   currentLvlIndex: number;
   /**
    * The current top ranked item the model has predicted and identified from
@@ -94,11 +91,10 @@ export class Game {
     this.isRunning = false;
     this.cameraPaused = false;
     this.score = 0;
-    this.timer = GAME_START_TIME;
     this.emojisFound = [];
     this.endGamePhotos = [];
     this.topItemGuess = null;
-    this.emojiLvlDemo = Array.from(EMOJIS_LVL_1);
+    this.emojiLvlDemo = Array.from(OBJECTS_LVL_1);
     this.emojiLvlLookup = {
       '1': this.emojiLvlDemo
     };
@@ -315,38 +311,6 @@ export class Game {
     }
   }
 
-  /**
-   * Handles the game timer logic that is executed at every GAME_TIMER_DELAY
-   * (currently every second)
-   */
-  handleGameTimerCountdown() {
-
-    if (this.timer === 0) {
-
-      window.clearInterval(this.timerInterval);
-
-      (<any>window).gtag('event', 'Failure', {
-        'event_category': 'Emoji',
-        'event_label': `${this.currentEmoji.emoji} - ${this.currentEmoji.name}`
-      });
-
-      if (this.score === 0) {
-        ui.showNoItemsFoundView();
-      }
-      else {
-        ui.showXItemsFoundView(this.endGamePhotos);
-      }
-    } else if (this.timer <= 5) {
-      if (this.timer === 5) {
-      }
-
-      ui.updateTimer(this.timer, false, true);
-    } else {
-      ui.updateTimer(this.timer);
-    }
-
-    this.timer--;
-  }
 
   /**
    * Determines if our top 2 matches from the MobileNet is the emoji we are
@@ -422,12 +386,12 @@ export class Game {
   reShuffleLevelEmojis(level: string) {
     switch (level) {
       case '1':
-        this.emojiLvlLookup[level] = shuffle(EMOJIS_LVL_1);
+        this.emojiLvlLookup[level] = shuffle(OBJECTS_LVL_1);
         break;
       case '#':
         // NOTE: the Demo list is not shuffled since we always request them in
         // same order for demo purposes.
-        this.emojiLvlLookup[level] = Array.from(EMOJIS_LVL_1);
+        this.emojiLvlLookup[level] = Array.from(OBJECTS_LVL_1);
         break;
       default:
         throw new Error('Error: expected ' + level + ' level string in the ' +

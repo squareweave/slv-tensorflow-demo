@@ -17,11 +17,11 @@
  */
 
  import 'babel-polyfill';
-import {game, GAME_START_TIME, GAME_EXTEND_TIME} from './game';
+import {game} from './game';
 import {addClass, removeClass} from './classes';
 import {camera} from './camera';
 import {share} from './share';
-import {isMobile, isIOS, isChromeIOS, getQueryParam} from './utils';
+import {isMobile, isChromeIOS, getQueryParam} from './utils';
 
 export const VIEWS = {
   LOADING: 'loading',
@@ -500,37 +500,6 @@ export class Ui {
   }
 
   /**
-   * Updates the timer element with the new time with a slight delay in update
-   * time. This is so that we can create a staggered UI affect as the timer gets
-   * updated.
-   * @param value The value to update the timer UI to.
-   */
-  delayedUpdateTimer(value: number) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        this.updateTimer(value);
-        resolve(value);
-      }, 70);
-    });
-  }
-
-  /**
-   * Extends the timer with an additional game extends amount (GAME_EXTEND_TIME)
-   * using a staggered affect to show the timer UI updating over time.
-   *
-   * @async
-   */
-  async extendTimer() {
-
-    let maxTimer = ((game.timer + 1) + GAME_EXTEND_TIME) + 1;
-    for (let i = game.timer + 2; i < maxTimer; i++) {
-      await this.delayedUpdateTimer(i);
-    }
-
-    game.timer = maxTimer - 1;
-  }
-
-  /**
    * Updates the score UI.
    */
   updateScore() {
@@ -738,7 +707,6 @@ export class Ui {
   showItemFoundView() {
     this.showView(VIEWS.FOUND_ITEM);
     this.updateScore();
-    this.extendTimer();
   }
 
   /**
@@ -748,20 +716,10 @@ export class Ui {
    */
   showNoItemsFoundView() {
     game.pauseGame();
-
-
     let msg = this.sleuthSpeakingFoundNoMsg;
     this.setSleuthSpeakerText(msg);
-    if (isIOS()) {
-      //game.spriteSpeak('timeup');
-    } else {
-      //game.speak(msg);
-    }
     this.setActiveView(VIEWS.FOUND_NO_ITEMS);
-    this.slideView(VIEWS.FOUND_NO_ITEMS, CSS_CLASSES.SLIDE_DOWN,
-        false).then(values => {
-      this.updateTimer(GAME_START_TIME);
-    });
+    this.slideView(VIEWS.FOUND_NO_ITEMS, CSS_CLASSES.SLIDE_DOWN, false)
   }
 
   /**
@@ -777,10 +735,7 @@ export class Ui {
     let msg = this.sleuthSpeakingFoundXMsg;
     this.setSleuthSpeakerText(msg);
     this.setActiveView(VIEWS.FOUND_X_ITEMS);
-    this.slideView(VIEWS.FOUND_X_ITEMS, CSS_CLASSES.SLIDE_DOWN,
-        false).then(values => {
-      this.updateTimer(GAME_START_TIME);
-    });
+    this.slideView(VIEWS.FOUND_X_ITEMS, CSS_CLASSES.SLIDE_DOWN, false)
   }
 
   /**
@@ -884,7 +839,7 @@ export class Ui {
       game.isRunning = false;
     }
 
-    this.updateTimer(game.timer, true);
+    //this.updateTimer(game.timer, true);
 
     if (this.activeView === VIEWS.LANDING ||
         this.activeView === VIEWS.LOADING) {

@@ -16,14 +16,14 @@
  * =============================================================================
  */
 
-export interface EmojiItem {
+export interface ExhibitItem {
   [index: string]: string;
 }
 
-export const EMOJIS_LVL_1: Array<EmojiItem> = [
+export const OBJECTS_LVL_1: Array<ExhibitItem> = [
   {
     'name': 'hand',
     'emoji': '✋',
-    'path': '/img/emojis/game/hand.svg'
+    'path': 'Hand'
   }
 ]; 
