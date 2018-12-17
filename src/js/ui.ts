@@ -17,8 +17,7 @@
  */
 
  import 'babel-polyfill';
-import {game, GAME_START_TIME, GAME_EXTEND_TIME,
-        AUDIO} from './game';
+import {game, GAME_START_TIME, GAME_EXTEND_TIME} from './game';
 import {addClass, removeClass} from './classes';
 import {camera} from './camera';
 import {share} from './share';
@@ -291,9 +290,6 @@ export class Ui {
 
     if (this.startGameBtn) {
       this.startGameBtn.addEventListener('click', () => {
-        if (game.firstRun) {
-          game.setupAudioSources();
-        }
         game.initGame();
 
         (<any>window).gtag('event', 'Click', {
@@ -525,12 +521,12 @@ export class Ui {
    * @async
    */
   async extendTimer() {
-    game.playAudio(AUDIO.TIMER_INCREASE, true);
+
     let maxTimer = ((game.timer + 1) + GAME_EXTEND_TIME) + 1;
     for (let i = game.timer + 2; i < maxTimer; i++) {
       await this.delayedUpdateTimer(i);
     }
-    game.pauseAudio(AUDIO.TIMER_INCREASE);
+
     game.timer = maxTimer - 1;
   }
 
@@ -752,14 +748,14 @@ export class Ui {
    */
   showNoItemsFoundView() {
     game.pauseGame();
-    game.playAudio(AUDIO.FAIL);
+
 
     let msg = this.sleuthSpeakingFoundNoMsg;
     this.setSleuthSpeakerText(msg);
     if (isIOS()) {
-      game.spriteSpeak('timeup');
+      //game.spriteSpeak('timeup');
     } else {
-      game.speak(msg);
+      //game.speak(msg);
     }
     this.setActiveView(VIEWS.FOUND_NO_ITEMS);
     this.slideView(VIEWS.FOUND_NO_ITEMS, CSS_CLASSES.SLIDE_DOWN,
@@ -778,15 +774,8 @@ export class Ui {
     game.pauseGame();
     this.setNrEmojisFound();
     this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.END);
-    game.playAudio(AUDIO.END);
-
     let msg = this.sleuthSpeakingFoundXMsg;
     this.setSleuthSpeakerText(msg);
-    if (isIOS()) {
-      game.spriteSpeak('found ' + game.emojisFound.length);
-    } else {
-      game.speak(msg);
-    }
     this.setActiveView(VIEWS.FOUND_X_ITEMS);
     this.slideView(VIEWS.FOUND_X_ITEMS, CSS_CLASSES.SLIDE_DOWN,
         false).then(values => {
@@ -802,17 +791,13 @@ export class Ui {
    */
   showAllItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
     game.pauseGame();
-    game.playAudio(AUDIO.WIN);
+
     this.setNrEmojisFound();
     this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.WIN);
 
     let msg = this.sleuthSpeakingFoundAllMsg;
     this.setSleuthSpeakerText(msg);
-    if (isIOS()) {
-      game.spriteSpeak('found ' + game.emojisFound.length);
-    } else {
-      game.speak(msg);
-    }
+
     this.setActiveView(VIEWS.FOUND_ALL_ITEMS);
     this.slideView(VIEWS.FOUND_ALL_ITEMS, CSS_CLASSES.SLIDE_DOWN, false);
   }
@@ -893,8 +878,6 @@ export class Ui {
    * @async
    */
   async showCountdown() {
-
-    game.playAudio(AUDIO.COUNTDOWN);
 
     // For performance reasons we should always call the countdown while the
     // predict engine is not running. We pause the game while the countdown is
