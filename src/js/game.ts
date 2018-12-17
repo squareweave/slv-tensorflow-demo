@@ -29,10 +29,7 @@ import {EmojiItem, EMOJIS_LVL_1} from './game_levels';
 
 export const GAME_START_TIME = 20;
 export const GAME_EXTEND_TIME = 10;
-export const GAME_MAX_ITEMS = 10;
-
-//const SPEAKING_DELAY = 2500; // 2.5 seconds
-//const GAME_TIMER_DELAY = 1000; // 1 second
+export const GAME_MAX_ITEMS = 2;
 
 export interface EmojiLevelsLookup {
   [index: string]: Array<EmojiItem>;
@@ -105,13 +102,8 @@ export class Game {
     this.emojiLvlLookup = {
       '1': this.emojiLvlDemo
     };
-    this.gameDifficulty = '1121222345';
+    this.gameDifficulty = '1';
     this.currentLvlIndex = 0;
-
-    if (getQueryParam('demo') === 'true') {
-      this.setupDemoMode();
-      this.demoMode = true;
-    }
 
     if (getQueryParam('debug') === 'true') {
       this.debugMode = true;
@@ -287,8 +279,6 @@ export class Game {
 
     ui.resetScrollPositions();
 
-    //this.resetAudioSources();
-
     this.currentLvlIndex = 0;
     if (this.demoMode) {
       this.reShuffleLevelEmojis('#');
@@ -296,18 +286,12 @@ export class Game {
     this.nextEmoji();
 
     this.score = 0;
-
-    //this.timer = GAME_START_TIME;
-    //this.timerAtStartOfRound = this.timer;
-
     this.emojisFound = [];
     this.endGamePhotos = [];
     this.firstSpeak = true;
     this.topItemGuess = null;
 
     ui.updateScore();
-    //ui.updateTimer(GAME_START_TIME);
-
     ui.resetSleuthSpeakerText();
     ui.hideSleuthSpeakerText();
   }
@@ -383,8 +367,6 @@ export class Game {
       if (this.firstSpeak) {
         let msg = ui.sleuthSpeakingSeeingMsg;
         ui.setSleuthSpeakerText(msg);
-        //this.speak(msg);
-        //this.firstSpeak = false;
       }
     }
 
@@ -458,13 +440,9 @@ export class Game {
    */
   emojiFound() {
     this.pauseGame();
-
-    //this.firstSpeak = true;
     this.score++;
     this.emojisFound.push(this.currentEmoji);
-    this.endGamePhotos.push(camera.snapshot());
-    //this.playAudio(AUDIO.FOUND_IT);
-
+    this.endGamePhotos.push(camera.snapshot())
     ui.cameraFlash();
 
     let timeToFind = this.timerAtStartOfRound - this.timer;
@@ -479,12 +457,6 @@ export class Game {
     } else {
       setTimeout(() => {
         ui.showItemFoundView();
-        //ui.setSleuthSpeakerText(ui.sleuthSpeakingFoundItMsg, true);
-        if (isIOS()) {
-          //this.spriteSpeak(this.currentEmoji.name);
-        } else {
-          //this.speak(ui.sleuthSpeakingFoundItMsgEmojiName);
-        }
       }, 1000);
     }
   }

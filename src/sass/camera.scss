@@ -16,8 +16,9 @@
  * =============================================================================
  */
 
-$c-camera-capture-flash: rgb(0, 253, 36);
-$c-camera-capture-bg: rgba(0, 253, 36, .4);
+ @import 'vars';
+$c-camera-capture-flash: rgb(255, 255, 255);
+$c-camera-capture-bg: rgba(255, 255, 255, .4);
 
 @keyframes flash-animation {
   from { opacity: 0 }

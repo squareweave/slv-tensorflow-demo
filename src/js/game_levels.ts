@@ -25,10 +25,5 @@ export const EMOJIS_LVL_1: Array<EmojiItem> = [
     'name': 'hand',
     'emoji': '✋',
     'path': '/img/emojis/game/hand.svg'
-  },
-  {
-    'name': 'mouse',
-    'emoji': '🖱',
-    'path': '/img/emojis/game/mouse.svg'
   }
 ]; 

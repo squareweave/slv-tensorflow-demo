@@ -132,7 +132,7 @@ export class Ui {
   quitBtn: HTMLElement;
   sleuthEmojiEl: HTMLImageElement;
   sleuthSpeakingEl: HTMLElement;
-  statusBarEmojiEl: HTMLImageElement;
+  statusBarEmojiEl: HTMLElement;
   countdownEmojiEl: HTMLImageElement;
   cameraFlashEl: HTMLElement;
   cameraCaptureEl: HTMLElement;
@@ -699,7 +699,7 @@ export class Ui {
    * @param emojiPath The emoji object path to the icon file.
    */
   setActiveEmoji(emojiPath: string) {
-    this.statusBarEmojiEl.src = emojiPath;
+    this.statusBarEmojiEl.textContent = emojiPath;
     this.countdownEmojiEl.src = emojiPath;
   }
 
@@ -866,9 +866,6 @@ export class Ui {
    */
   resetCountDownUi() {
     this.hideView(VIEWS.COUNTDOWN);
-    this.showView(VIEWS.COUNTDOWN3);
-    this.showView(VIEWS.COUNTDOWN2);
-    this.showView(VIEWS.COUNTDOWN1);
     this.showView(VIEWS.COUNTDOWN0);
   }
 
@@ -907,9 +904,6 @@ export class Ui {
 
     // This await logic ensures that each countdown view which returns a promise
     // blocks until each view resolves in the 1 second countdown time.
-    await this.countDown(VIEWS.COUNTDOWN3);
-    await this.countDown(VIEWS.COUNTDOWN2);
-    await this.countDown(VIEWS.COUNTDOWN1);
     await this.countDown(VIEWS.COUNTDOWN0);
   }
 

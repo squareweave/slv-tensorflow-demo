@@ -46,79 +46,27 @@
         <button class="btn quit-btn quit-btn--js">Quit</button>
       </div>
 
-      <!--<div class="view__about view__about--js">
-        <div class="view__info-bar">
-          <button class="view__info-bar__close-btn view__info-bar__close-btn--js">
-            <img src="/img/emojis/ui/crossmark.svg" alt="Close icon">
-          </button>
-        </div>
-        <div class="view__about__body">
-          <div class="view__about__video-container">
-            <iframe src="https://www.youtube.com/embed/jr3q_9pJBr8?rel=0&amp;showinfo=0&amp;controls=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-          </div>
-          <p class="views__heading  view__about__heading">About this game 🤳</p>
-          <p>
-            Emoji Scavenger Hunt is a browser-based game built with machine learning that uses your phone’s
-            camera and a neural network to try and guess what it’s seeing.
-            This is just one example of how machine learning can be used in fun ways.
-          </p>
-          <p>
-            Powered by <a href="https://js.tensorflow.org" target="_blank">Tensorflow.js</a>, the game is built to run efficiently on your phone’s
-            web browser without needing to access backend servers. No images from your camera are collected or stored.
-          </p>
-          <p>
-            Watch the video above to see how the project was created, browse the <a href="https://github.com/google/emoji-scavenger-hunt/" target="_blank">open-source code on GitHub</a>
-            to learn more about how it works, or explore more <a href="https://experiments.withgoogle.com/ai" target="_blank">A.I. Experiments</a> like this.
-          </p>
-          <p>This experiment was made by friends from the Brand Studio and PAIR teams at Google.</p>
-
-          <p class="views__heading  view__about__heading">Faq 🙋</p>
-          <p><strong>- It doesn’t work on my phone.</strong></p>
-          <p>Being an experiment and all, we're using the latest web technologies. It works best on phones & browsers like the latest version of Chrome on Google Pixel or other smartphones running the latest Android OS, or Safari on newer iPhones running the latest iOS.</p>
-
-          <p><strong>- Why doesn’t it recognize some items?</strong></p>
-          <p>It’s an experiment, and well, not perfect. We think seeing what works and what doesn’t is one way to help explore and understand how machine learning works.</p>
-
-          <p><strong>- Are my images being stored on Google servers?</strong></p>
-          <p>No. All the interactions are happening locally on your device. If you’re curious, check out our <a href="https://github.com/google/emoji-scavenger-hunt/" target="_blank">open-source code on GitHub</a></p>
-
-          <p class="views__heading  view__about__heading">Contact ✉️</p>
-          <p><a href="mailto:emojiscavengerhunt@google.com">Email us</a> or <a href="https://services.google.com/fh/files/misc/emojiscavengerhunt-presskit.zip">download the press kit</a></p>
-
-          <div class="view__about__privacy">
-            <a class="view__about__privacy__ai-badge" href="https://experiments.withgoogle.com/ai" target="_blank">
-              <img src="img/badge.svg" alt="Made with some friends at Google">
-            </a>
-            <a class="view__about__privacy__privacy-link" href="https://www.google.com/policies/" target="_blank">Privacy & Terms</a>
-          </div>
-        </div>
-      </div>
--->
       <div class="view__landing view__landing--js">
         <h1>
-          <img class="view__landing__logo" src="img/logo.svg" alt="Emoji Scavenger Hunt">
+          <img class="view__landing__logo" src="img/slv-white.png" alt="SLV Demo">
         </h1>
-        <p class="view__landing__intro view__landing__intro--js">Locate the emoji we show you in the real world with your phone’s camera.
-          A neural network will try to guess what it’s seeing.<br />Make sure your sound is on.</p>
-        <button class="btn play-btn landing__play-btn--js">Let's Play</button>
-        <p class="view__landing__desktop-msg view__landing__desktop-msg--js">Emoji Scavenger Hunt is best experienced on phones.</p>
-        <p class="view__landing__age-msg view__landing__age-msg--js">By pressing the button above, I certify that I am over 13 years old.<br>
-          <a class="view__landing__age-msg__privacy-link" href="https://www.google.com/policies/" target="_blank">Privacy & Terms</a>
-        </p>
+        <p class="view__landing__intro view__landing__intro--js">Locate the object in the real world using your phone's camera! A Neural network will try to guess what it's seeing.</p>
+        <button class="btn play-btn landing__play-btn--js">Begin</button>
+        <p class="view__landing__desktop-msg view__landing__desktop-msg--js">This demo works best on mobile phones.</p>
       </div>
 
       <div class="view__countdown view__countdown--js">
         <div class="view__countdown__3 view__countdown__3--js">
-          <span class="view__countdown__count">3</span>
-          <p class="view__countdown__find-msg">Find the emoji and point your camera at it before time expires.</p>
+            <img class="view__loading__icon" src="/img/loading.gif" alt="Loading magnifying glass">
+            <p class="views__heading view__loading__heading">Loading ...</p>
         </div>
         <div class="view__countdown__2 view__countdown__2--js">
-          <span class="view__countdown__count">2</span>
-          <p class="view__countdown__find-msg">Find the emoji and point your camera at it before time expires.</p>
+            <img class="view__loading__icon" src="/img/loading.gif" alt="Loading magnifying glass">
+            <p class="views__heading view__loading__heading">Loading ...</p>
         </div>
         <div class="view__countdown__1 view__countdown__1--js">
-          <span class="view__countdown__count">1</span>
-          <p class="view__countdown__find-msg">Find the emoji and point your camera at it before time expires.</p>
+            <img class="view__loading__icon" src="/img/loading.gif" alt="Loading magnifying glass">
+            <p class="views__heading view__loading__heading">Loading ...</p>
         </div>
         <div class="view__countdown__0 view__countdown__0--js">
           <p class="view__countdown__0__find">Find <img src="/img/emojis/ui/sleuth.svg" class="view__countdown__0__emoji view__countdown__0__emoji--js" /></p>
@@ -128,7 +76,7 @@
       </div>
 
       <div class="view__sleuth view__sleuth--js">
-        <img class="view__sleuth__emoji view__sleuth__emoji--js" src="/img/emojis/ui/sleuth.svg" alt="Sleuth emoji" />
+       <!--<img class="view__sleuth__emoji view__sleuth__emoji--js" src="/img/emojis/ui/sleuth.svg" alt="Sleuth emoji" />-->
         <p class="view__sleuth__speaking view__sleuth__speaking--js"></p>
       </div>
 
@@ -206,11 +154,14 @@
         <div class="view__status-bar__info">
           <img class="view__status-bar__info__emoji" src="/img/emojis/ui/trophy.svg" />
           <span class="view__status-bar__info__score view__status-bar__info__score--js">0</span>
+          
           <img class="view__status-bar__info__emoji" src="/img/emojis/ui/stopwatch.svg" />
           <div class="view__status-bar__info__timer-container">
             <span class="view__status-bar__info__timer view__status-bar__info__timer--js"></span>
             <span class="view__status-bar__info__timer-flash view__status-bar__info__timer-flash--js"></span>
           </div>
+
+
         </div>
       </div>
 
