@@ -54,10 +54,10 @@ const SELECTORS = {
   CAMERA_QUIT_BTN: '.view__camera__quit-btn--js',
   QUIT_CANCEL_BTN: '.quit-cancel-btn--js',
   QUIT_BTN: '.quit-btn--js',
-  NEXT_EMOJI_BTN: '.next-emoji-btn--js',
-  SLEUTH_EMOJI: '.view__sleuth__emoji--js',
+  NEXT_object_BTN: '.next-object-btn--js',
+  SLEUTH_object: '.view__sleuth__object--js',
   SLEUTH_SPEAKING_EL: '.view__sleuth__speaking--js',
-  STATUS_BAR_EMOJI_EL: '.view__status-bar__find__emoji--js',
+  STATUS_BAR_object_EL: '.view__status-bar__find__object--js',
   CAMERA_FLASH_EL: '.camera__capture-flash--js',
   CAMERA_CAPTURE_EL: '.camera__capture-wrapper--js',
   CAMERA_DESKTOP_MSG_EL: '.view__camera__desktop-msg',
@@ -66,8 +66,8 @@ const SELECTORS = {
   SCORE_EL: '.view__status-bar__info__score--js',
   NR_FOUND_EL: '.view__found-x-items__nr-found--js',
   NR_MAX_FOUND_EL: '.view__found-all-items__nr-found--js',
-  EMOJI_FOUND_LIST: '.view__found-x-items__emojis--js',
-  EMOJI_MAX_FOUND_LIST: '.view__found-all-items__emojis--js',
+  OBJECT_FOUND_LIST: '.view__found-x-items__objects--js',
+  OBJECT_MAX_FOUND_LIST: '.view__found-all-items__objects--js',
   LANDING_DESKTOP_MSG_EL: '.view__landing__desktop-msg--js',
   LANDING_PLATFORM_MSG_EL: '.view__landing__platform-msg--js',
   LANDING_INFO_MSG_EL: '.view__landing__intro--js',
@@ -89,11 +89,11 @@ const GAME_OUTCOME = {
 export const GAME_STRINGS = {
   CAMERA_NO_ACCESS: 'Hey! To play you’ll need to enable camera access in ' +
       'your browser address bar 👆. Your camera is how you’ll ' +
-      'find emojis in the real world. We won’t store any ' +
+      'find objects in the real world. We won’t store any ' +
       'images from your camera. 👍',
   SAFARI_WEBVIEW: '🚨 To play this game, please open it directly in Safari. ' +
       'If needed, copy/paste or type the URL into the address bar. ' +
-      'https://g.co/emojiscavengerhunt 🚨',
+      'https://g.co/objectscavengerhunt 🚨',
   CAMERA_GENERAL_ERROR: 'It looks like your browser or device doesn’t ' +
       'support this experiment. It’s designed to work best ' +
       'on mobile (iOS/Safari or Android/Chrome). 😭'
@@ -109,26 +109,26 @@ export class Ui {
   startGameBtn: HTMLButtonElement;
   predictionResultsEl: HTMLElement;
   replayGameBtns: NodeListOf<Element>;
-  nextEmojiBtn: HTMLElement;
+  nextobjectBtn: HTMLElement;
   closeAboutBtn: HTMLElement;
   homeBtns: NodeListOf<Element>;
   aboutBtns: NodeListOf<Element>;
   cameraQuitBtn: HTMLElement;
   quitCancelBtn: HTMLElement;
   quitBtn: HTMLElement;
-  sleuthEmojiEl: HTMLImageElement;
+  sleuthobjectEl: HTMLImageElement;
   sleuthSpeakingEl: HTMLElement;
-  statusBarEmojiEl: HTMLElement;
+  statusBarobjectEl: HTMLElement;
   cameraFlashEl: HTMLElement;
   cameraCaptureEl: HTMLElement;
   cameraDesktopMsgEl: HTMLElement;
   timerEl: HTMLElement;
   timerFlashEl: HTMLElement;
   scoreEl: HTMLElement;
-  nrEmojisFoundEl: HTMLElement;
-  nrMaxEmojisFoundEl: HTMLElement;
-  emojisFoundListEl: HTMLElement;
-  emojisMaxFoundListEl: HTMLElement;
+  nrobjectsFoundEl: HTMLElement;
+  nrMaxobjectsFoundEl: HTMLElement;
+  objectsFoundListEl: HTMLElement;
+  objectsMaxFoundListEl: HTMLElement;
   landingDesktopMsgEl: HTMLElement;
   landingPlatformMsgEl: HTMLElement;
   landingInfoMsgEl: HTMLElement;
@@ -156,18 +156,18 @@ export class Ui {
 
     this.startGameBtn = document.querySelector(SELECTORS.START_GAME_BTN);
     this.replayGameBtns = document.querySelectorAll(SELECTORS.REPLAY_GAME_BTN);
-    this.nextEmojiBtn = document.querySelector(SELECTORS.NEXT_EMOJI_BTN);
+    this.nextobjectBtn = document.querySelector(SELECTORS.NEXT_object_BTN);
     this.closeAboutBtn = document.querySelector(SELECTORS.CLOSE_BTN);
     this.aboutBtns = document.querySelectorAll(SELECTORS.ABOUT_BTN);
     this.homeBtns = document.querySelectorAll(SELECTORS.HOME_BTN);
     this.cameraQuitBtn = document.querySelector(SELECTORS.CAMERA_QUIT_BTN);
     this.quitCancelBtn = document.querySelector(SELECTORS.QUIT_CANCEL_BTN);
     this.quitBtn = document.querySelector(SELECTORS.QUIT_BTN);
-    this.sleuthEmojiEl = document.querySelector(SELECTORS.SLEUTH_EMOJI);
+    this.sleuthobjectEl = document.querySelector(SELECTORS.SLEUTH_object);
     this.sleuthSpeakingEl =
         document.querySelector(SELECTORS.SLEUTH_SPEAKING_EL);
-    this.statusBarEmojiEl =
-        document.querySelector(SELECTORS.STATUS_BAR_EMOJI_EL);
+    this.statusBarobjectEl =
+        document.querySelector(SELECTORS.STATUS_BAR_object_EL);
     this.cameraFlashEl = document.querySelector(SELECTORS.CAMERA_FLASH_EL);
     this.cameraCaptureEl = document.querySelector(SELECTORS.CAMERA_CAPTURE_EL);
     this.cameraDesktopMsgEl =
@@ -175,11 +175,11 @@ export class Ui {
     this.timerEl = document.querySelector(SELECTORS.TIMER_EL);
     this.timerFlashEl = document.querySelector(SELECTORS.TIMER_FLASH_EL);
     this.scoreEl = document.querySelector(SELECTORS.SCORE_EL);
-    this.nrEmojisFoundEl = document.querySelector(SELECTORS.NR_FOUND_EL);
-    this.nrMaxEmojisFoundEl = document.querySelector(SELECTORS.NR_MAX_FOUND_EL);
-    this.emojisFoundListEl = document.querySelector(SELECTORS.EMOJI_FOUND_LIST);
-    this.emojisMaxFoundListEl =
-        document.querySelector(SELECTORS.EMOJI_MAX_FOUND_LIST);
+    this.nrobjectsFoundEl = document.querySelector(SELECTORS.NR_FOUND_EL);
+    this.nrMaxobjectsFoundEl = document.querySelector(SELECTORS.NR_MAX_FOUND_EL);
+    this.objectsFoundListEl = document.querySelector(SELECTORS.OBJECT_FOUND_LIST);
+    this.objectsMaxFoundListEl =
+        document.querySelector(SELECTORS.OBJECT_MAX_FOUND_LIST);
     this.predictionResultsEl =
         document.querySelector(SELECTORS.PREDICTION_RESULTS_EL);
     this.landingDesktopMsgEl =
@@ -301,9 +301,9 @@ export class Ui {
       }
     }
 
-    if (this.nextEmojiBtn) {
-      this.nextEmojiBtn.addEventListener('click',
-          this.nextEmojiBtnClick.bind(this));
+    if (this.nextobjectBtn) {
+      this.nextobjectBtn.addEventListener('click',
+          this.nextobjectBtnClick.bind(this));
     }
 
     if (this.cameraQuitBtn) {
@@ -341,7 +341,7 @@ export class Ui {
     if (this.closeAboutBtn) {
       this.closeAboutBtn.addEventListener('click', () => {
         this.hideView(VIEWS.ABOUT);
-        history.replaceState({page: '/'}, 'Emoji Scavenger Hunt', '/');
+        history.replaceState({page: '/'}, 'object Scavenger Hunt', '/');
       });
     }
 
@@ -374,23 +374,12 @@ export class Ui {
   }
 
   /**
-   * The found message shown in the sleuth UI which includes an emoji icon.
+   * The found message shown in the sleuth UI which includes an object icon.
    *
    * @returns The sleuth found message display string.
    */
   get sleuthSpeakingFoundItMsg(): string {
-    return `Hey you found <img class="view__sleuth__speaking__emoji"` +
-           `src="${game.currentEmoji}"` +
-           `alt="${game.currentEmoji} icon"/>\u00A0!`;
-  }
-
-  /**
-   * The found message spoken by the sleuth which includes the emoji label.
-   *
-   * @returns The sleuth found message speak string.
-   */
-  get sleuthSpeakingFoundItMsgEmojiName(): string {
-    return `Hey you found ${game.currentEmoji}\u00A0!`;
+    return `Hey you found ${game.foundObject}`;
   }
 
   /**
@@ -410,6 +399,19 @@ export class Ui {
    */
   get sleuthSpeakingFoundAllMsg(): string {
     return 'You did it!';
+  }
+
+ /**
+   * The message shown and spoken when the model sees items in the real world.
+   *
+   * @returns A message constructed with our sleuthSpeakingPrefixes plus some
+   * item seen in the real world.
+   */
+  get sleuthSpeakingSeeingMsg(): string {
+    let randomIndex = Math.floor(this.sleuthSpeakingPrefixes.length *
+        Math.random());
+    return this.sleuthSpeakingPrefixes[randomIndex] +
+           game.topItemGuess.toString() + ' ?';
   }
 
   /**
@@ -445,54 +447,64 @@ export class Ui {
   }
 
   /**
-   * Updates the win and end screens UI elements with the list of emojis icons
+   * Updates the win and end screens UI elements with the list of objects icons
    * that the user found.
-   * @param endGamePhotos An array of images matching the emoji found.
+   * @param endGamePhotos An array of images matching the object found.
    * @param screen Which screen this was called from, either 'Win' or 'End'.
    */
-  setEmojisFoundList(
-      endGamePhotos: Array<HTMLImageElement>, screen: string) {
+  setobjectsFoundList(
+    endGamePhotos: Array<HTMLImageElement>, screen: string) {
 
-    let emojiFoundString = '';
+      let objectFoundString = '';
+      let spacer = '';
+  
+      let photoContainer = document.createElement('div');
+      addClass(photoContainer, 'view__found-x-items__objects__grid');
+      addClass(photoContainer, 'view__found-x-items__objects__grid--js');
+  
+      if (endGamePhotos[0].width >= endGamePhotos[0].height) {
+        addClass(photoContainer, 'landscape');
+      } else {
+        addClass(photoContainer, 'portrait');
+      }
+  
+      let item = game.foundObject;
+      spacer = ' ';
+      objectFoundString = objectFoundString + item.object + spacer;
 
-    let photoContainer = document.createElement('div');
-    addClass(photoContainer, 'view__found-x-items__emojis__grid');
-    addClass(photoContainer, 'view__found-x-items__emojis__grid--js');
+      let figure = document.createElement('figure');
+      addClass(figure, 'view__found-x-items__objects__grid__item');
+      addClass(figure, 'view__found-x-items__objects__grid__item--js');
 
-    if (endGamePhotos[0].width >= endGamePhotos[0].height) {
-      addClass(photoContainer, 'landscape');
-    } else {
-      addClass(photoContainer, 'portrait');
-    }
+      figure.appendChild(endGamePhotos[0]);
 
+      let caption = document.createElement('figcaption');
 
-    while (this.emojisFoundListEl.firstChild) {
-      this.emojisFoundListEl.removeChild(this.emojisFoundListEl.firstChild);
-    }
+      figure.appendChild(caption);
+      caption.innerText = `You found the ${item.name}!`;
 
-    while (this.emojisMaxFoundListEl.firstChild) {
-      this.emojisMaxFoundListEl.removeChild(
-          this.emojisMaxFoundListEl.firstChild);
-    }
+      photoContainer.appendChild(figure);
+     console.log(this.objectsFoundListEl);
+      while (this.objectsFoundListEl.firstChild) {
+        this.objectsFoundListEl.removeChild(this.objectsFoundListEl.firstChild);
+      }
+  
+      while (this.objectsMaxFoundListEl.firstChild) {
+        this.objectsMaxFoundListEl.removeChild(
+            this.objectsMaxFoundListEl.firstChild);
+      }
+  
+      addClass(photoContainer, 'photos-' + 1);
+  
+      this.objectsFoundListEl.appendChild(photoContainer.cloneNode(true));
+      this.objectsMaxFoundListEl.appendChild(photoContainer);
 
-    addClass(photoContainer, 'photos-' + 3);
-
-    this.emojisFoundListEl.appendChild(photoContainer.cloneNode(true));
-    this.emojisMaxFoundListEl.appendChild(photoContainer);
-
-    (<any>window).gtag('event', `${screen}`, {
-      'event_category': 'Game',
-      'event_label': `${emojiFoundString}`
-    });
-
-    // Also update the twitter sharing links with the list of emojis
-    //share.setTwitterShareLinks(emojiFoundString);
   }
 
   /**
-   * Resets the UI after an emoji was found and shows the UI for the next emoji.
+   * Resets the UI after an object was found and shows the UI for the next object.
    */
-  nextEmojiBtnClick() {
+  nextobjectBtnClick() {
     this.resetSleuthSpeakerText();
     this.hideSleuthSpeakerText();
     this.resetCameraAfterFlash();
@@ -538,11 +550,11 @@ export class Ui {
   }
 
   /**
-   * Sets the active emoji we are currently trying to find.
-   * @param emojiPath The emoji object path to the icon file.
+   * Sets the active object we are currently trying to find.
+   * @param objectPath The object object path to the icon file.
    */
-  setActiveEmoji(emojiPath: string) {
-    this.statusBarEmojiEl.textContent = emojiPath;
+  setActiveobject(objectPath: string) {
+    this.statusBarobjectEl.textContent = objectPath;
   }
 
   /**
@@ -574,7 +586,7 @@ export class Ui {
   }
 
   /**
-   * Triggers the actions related to finding an emoji. Updating the view, score
+   * Triggers the actions related to finding an object. Updating the view, score
    * and timer.
    */
   showItemFoundView() {
@@ -583,30 +595,14 @@ export class Ui {
 
   /**
    * Triggers the actions related to the game ending with the user having found
-   * 1 or more emojis. NOTE this view slides in from the top and doesn't simply
-   * display like other views. Before sliding in this view we update relevant
-   * UI elements related to it.
-   */
-  showXItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
-    game.pauseGame();
-
-    this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.END);
-    //let msg = this.sleuthSpeakingFoundXMsg;
-    //this.setSleuthSpeakerText(msg);
-    this.setActiveView(VIEWS.FOUND_X_ITEMS);
-    this.slideView(VIEWS.FOUND_X_ITEMS, CSS_CLASSES.SLIDE_DOWN, false)
-  }
-
-  /**
-   * Triggers the actions related to the game ending with the user having found
-   * all emojis for this game instance. NOTE this view slides in from the top
+   * all objects for this game instance. NOTE this view slides in from the top
    * and doesn't simply display like other views. Before sliding in this view
    * we update relevant UI elements related to it.
    */
-  showAllItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
+  showItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
     game.pauseGame();
 
-    this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.WIN);
+    this.setobjectsFoundList(endGamePhotos, GAME_OUTCOME.WIN);
 
     let msg = this.sleuthSpeakingFoundAllMsg;
     this.setSleuthSpeakerText(msg);

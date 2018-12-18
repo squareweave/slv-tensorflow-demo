@@ -25,47 +25,42 @@ import {getQueryParam, isIOS} from './utils';
 import * as tfc from '@tensorflow/tfjs-core';
 import {ExhibitItem, OBJECTS} from './game_levels';
 
-export const GAME_MAX_ITEMS = 1;
-
-export interface EmojiLevelsLookup {
-  [index: string]: Array<ExhibitItem>;
-}
-
-interface CameraDimentions {
+interface CameraDimensions {
   [index: number]: number;
 }
 
 /** Manages game state and various tasks related to game events. */
 export class Game {
   /** Our MobileNet instance and how we get access to our trained model. */
-  emojiScavengerMobileNet: MobileNet;
+  objectScavengerMobileNet: MobileNet;
   isRunning: boolean;
   cameraPaused: boolean;
   objectsFound: Array<ExhibitItem>;
   objects: Array<ExhibitItem>;
   foundObject: ExhibitItem;
+  /** Speak interval for reading out objects from the camera every x seconds. */
+  speakInterval: number;
   /**
    * The current top ranked item the model has predicted and identified from
    * the camera.
    */
   topItemGuess: string;
-  currentEmoji: string;
+  currentObject: string;
   /** An array of snapshots taken when the model finds an emoji. */
   endGamePhotos: Array<HTMLImageElement>;
   debugMode = false;
   gameIsPaused = false;
   firstRun = true;
-  firstSpeak = true;
   stats: Stats;
 
   constructor() {
-    this.emojiScavengerMobileNet = new MobileNet();
+    this.objectScavengerMobileNet = new MobileNet();
     this.isRunning = false;
     this.cameraPaused = false;
     this.endGamePhotos = [];
     this.objectsFound = [];
     this.topItemGuess = null;
-    this.currentEmoji = 'derrick';
+    this.currentObject = 'derrick';
     this.objects = Array.from(OBJECTS);
     if (getQueryParam('debug') === 'true') {
       this.debugMode = true;
@@ -77,7 +72,7 @@ export class Game {
    * preempt the predict tensor setups.
    */
   warmUpModel() {
-    this.emojiScavengerMobileNet.predict(
+    this.objectScavengerMobileNet.predict(
         tfc.zeros([VIDEO_PIXELS, VIDEO_PIXELS, 3]));
   }
 
@@ -114,16 +109,16 @@ export class Game {
               pixels.slice([beginHeight, beginWidth, 0],
                            [VIDEO_PIXELS, VIDEO_PIXELS, 3]);
 
-        return this.emojiScavengerMobileNet.predict(pixelsCropped);
+        return this.objectScavengerMobileNet.predict(pixelsCropped);
       });
 
       // This call retrieves the topK matches from our MobileNet for the
       // provided image data.
       const topK =
-          await this.emojiScavengerMobileNet.getTopKClasses(result, 10);
+          await this.objectScavengerMobileNet.getTopKClasses(result, 10);
 
       // Match the top 2 matches against our current active emoji.
-      this.checkEmojiMatch(topK[0].label, topK[1].label);
+      this.checkObjectMatch(topK[0].label, topK[1].label);
 
       // if ?debug=true is passed in as a query param show the topK classes
       // on screen to help with debugging.
@@ -164,8 +159,8 @@ export class Game {
       ui.showView(VIEWS.LOADING);
 
       Promise.all([
-        this.emojiScavengerMobileNet.load().then(() => this.warmUpModel()),
-        camera.setupCamera().then((value: CameraDimentions) => {
+        this.objectScavengerMobileNet.load().then(() => this.warmUpModel()),
+        camera.setupCamera().then((value: CameraDimensions) => {
           camera.setupVideoDimensions(value[0], value[1]);
         }),
       ]).then(values => {
@@ -210,6 +205,10 @@ export class Game {
   startGame() {
     camera.unPauseCamera();
     this.isRunning = true;
+    this.speakInterval = window.setInterval(() => {
+      let msg = ui.sleuthSpeakingSeeingMsg;
+      ui.setSleuthSpeakerText(msg);
+    }, 500);
   }
 
   /**
@@ -220,9 +219,10 @@ export class Game {
     this.pauseGame();
     this.topItemGuess = null;
     this.endGamePhotos = [];
-    this.firstSpeak = true;
+
     ui.resetSleuthSpeakerText();
     ui.hideSleuthSpeakerText();
+
   }
 
   /**
@@ -232,6 +232,7 @@ export class Game {
     this.gameIsPaused = true;
     this.isRunning = false;
     camera.pauseCamera();
+    window.clearInterval(this.speakInterval);
   }
 
   /**
@@ -244,39 +245,37 @@ export class Game {
   }
 
   /**
-   * Determines if our top 2 matches from the MobileNet is the emoji we are
+   * Determines if our top 2 matches from the MobileNet is the object we are
    * currently looking to find.
-   * @param emojiNameTop1 Top guess emoji name.
-   * @param emojiNameTop2 Second place guess emoji name.
+   * @param objectTop1 Top guess name.
+   * @param objectTop2 Second place guess  name.
    */
-  checkEmojiMatch(emojiNameTop1: string, emojiNameTop2: string) {
+  checkObjectMatch(objectTop1: string, objectTop2: string) {
     // If our top guess is different from when we last checked update the
     // top guess.
 
-    if (this.topItemGuess !== emojiNameTop1) {
-      this.topItemGuess = emojiNameTop1;
+    if (this.topItemGuess !== objectTop1) {
+      this.topItemGuess = objectTop1;
     }
 
-    let finder = this.objects.find(element => element.name === emojiNameTop1 || element.name === emojiNameTop2);
+    let finder = this.objects.find(element => element.name === objectTop1 || element.name === objectTop2);
 
     if (finder) {
       this.foundObject = finder;
-      this.emojiFound();
+      this.objectFound();
     }
 
   }
 
-
   /**
-   * Triggers the camera flash and updates the score when we find an emoji.
+   * Triggers the camera flash and updates the score when we find an object.
    */
-  emojiFound() {
+  objectFound() {
     this.pauseGame();
     this.objectsFound.push(this.foundObject);
-    console.log(this.foundObject);
     this.endGamePhotos.push(camera.snapshot())
     ui.cameraFlash();
-    ui.showAllItemsFoundView(this.endGamePhotos);
+    ui.showItemsFoundView(this.endGamePhotos);
   }
 }
 
