@@ -20,10 +20,16 @@ export interface ExhibitItem {
   [index: string]: string;
 }
 
-export const OBJECTS_LVL_1: Array<ExhibitItem> = [
+export const OBJECTS: Array<ExhibitItem> = [
   {
     'name': 'hand',
     'emoji': '✋',
     'path': 'Hand'
-  }
+  },
+  {
+    'name': 'sunglasses',
+    'emoji': '🕶',
+    'path': 'Sunglasses'
+  },
+  
 ]; 

@@ -21,12 +21,11 @@ import * as Stats from 'stats.js';
 import {MobileNet} from './mobilenet';
 import {camera, VIDEO_PIXELS} from './camera';
 import {VIEWS, ui, GAME_STRINGS} from './ui';
-import {share} from './share';
 import {getQueryParam, isIOS} from './utils';
-import {shuffle} from 'lodash';
 import * as tfc from '@tensorflow/tfjs-core';
-import {ExhibitItem, OBJECTS_LVL_1} from './game_levels';
-export const GAME_MAX_ITEMS = 2;
+import {ExhibitItem, OBJECTS} from './game_levels';
+
+export const GAME_MAX_ITEMS = 1;
 
 export interface EmojiLevelsLookup {
   [index: string]: Array<ExhibitItem>;
@@ -36,50 +35,23 @@ interface CameraDimentions {
   [index: number]: number;
 }
 
-export interface Sleuths {
-  [index: string]: string;
-}
-
-
 /** Manages game state and various tasks related to game events. */
 export class Game {
   /** Our MobileNet instance and how we get access to our trained model. */
   emojiScavengerMobileNet: MobileNet;
   isRunning: boolean;
   cameraPaused: boolean;
-  /** The current score for the user based on how many emoji they have found. */
-  score: number;
-  /** The available time to find the emoji (in seconds). */
-  timer: number;
-  timerAtStartOfRound: number;
-  /** Timer interval so we can continually update the timer. */
-  timerInterval: number;
-  emojiLvlDemo: Array<ExhibitItem>;
-  /**
-   * A lookup containing references to each level of emoji which can be used
-   * to find the next emoji from that particular level.
-   */
-  emojiLvlLookup: EmojiLevelsLookup;
-  /** Array of emoji items the user has found during this game instance. */
-  emojisFound: Array<ExhibitItem>;
-  /**
-   * A string containing the order of emojis levels we will pick randomly from
-   * for each game instance. E.g '1123445' would pick one item from level 1
-   * followed by another from level 1, then one from level 2 etc.
-   */
-  gameDifficulty: string;
-  /** The current emoji to find. */
-  currentEmoji: ExhibitItem;
-  currentLvlIndex: number;
+  objectsFound: Array<ExhibitItem>;
+  objects: Array<ExhibitItem>;
+  foundObject: ExhibitItem;
   /**
    * The current top ranked item the model has predicted and identified from
    * the camera.
    */
   topItemGuess: string;
-  sleuth: Sleuths;
+  currentEmoji: string;
   /** An array of snapshots taken when the model finds an emoji. */
   endGamePhotos: Array<HTMLImageElement>;
-  demoMode = false;
   debugMode = false;
   gameIsPaused = false;
   firstRun = true;
@@ -90,31 +62,15 @@ export class Game {
     this.emojiScavengerMobileNet = new MobileNet();
     this.isRunning = false;
     this.cameraPaused = false;
-    this.score = 0;
-    this.emojisFound = [];
     this.endGamePhotos = [];
+    this.objectsFound = [];
     this.topItemGuess = null;
-    this.emojiLvlDemo = Array.from(OBJECTS_LVL_1);
-    this.emojiLvlLookup = {
-      '1': this.emojiLvlDemo
-    };
-    this.gameDifficulty = '1';
-    this.currentLvlIndex = 0;
-
+    this.currentEmoji = 'derrick';
+    this.objects = Array.from(OBJECTS);
     if (getQueryParam('debug') === 'true') {
       this.debugMode = true;
     }
-
-    share.initShareElements();
-
   }
-
-  setupDemoMode() {
-    // Sets the game emojis to use the demo emojis from EMOJIS_LVL_DEMO.
-    // This set is also not shuffled and always appear in the same order.
-    this.gameDifficulty = '#';
-  }
-
   /**
    * Ensures the MobileNet prediction model in tensorflow.js is ready to
    * accept data when we need it by triggering a predict call with zeros to
@@ -206,6 +162,7 @@ export class Game {
       }
 
       ui.showView(VIEWS.LOADING);
+
       Promise.all([
         this.emojiScavengerMobileNet.load().then(() => this.warmUpModel()),
         camera.setupCamera().then((value: CameraDimentions) => {
@@ -218,9 +175,8 @@ export class Game {
         // NOTE the predict engine will only do calculations if game.isRunning
         // is set to true. We trigger that inside our countdown Promise.
         this.firstRun = false;
-        this.nextEmoji();
         this.predict();
-        ui.showCountdown();
+        ui.showCamera();
       }).catch(error => {
         ui.startGameBtn.style.display = 'none';
         ui.ageDisclaimerMsgEl.style.display = 'none';
@@ -243,7 +199,7 @@ export class Game {
         }
       });
     } else {
-      ui.showCountdown();
+      ui.showCamera();
     }
   }
 
@@ -257,37 +213,14 @@ export class Game {
   }
 
   /**
-   * Restarts the game.
-   */
-  restartGame() {
-    if (ui.activeView === VIEWS.FOUND_ALL_ITEMS) {
-      ui.resetCameraAfterFlash();
-    }
-
-    this.resetGame();
-    ui.showCountdown();
-  }
-
-  /**
    * Resets all game variables and UI so we can start a new game instance.
    */
   resetGame() {
-
     ui.resetScrollPositions();
-
-    this.currentLvlIndex = 0;
-    if (this.demoMode) {
-      this.reShuffleLevelEmojis('#');
-    }
-    this.nextEmoji();
-
-    this.score = 0;
-    this.emojisFound = [];
+    this.pauseGame();
+    this.topItemGuess = null;
     this.endGamePhotos = [];
     this.firstSpeak = true;
-    this.topItemGuess = null;
-
-    ui.updateScore();
     ui.resetSleuthSpeakerText();
     ui.hideSleuthSpeakerText();
   }
@@ -299,7 +232,6 @@ export class Game {
     this.gameIsPaused = true;
     this.isRunning = false;
     camera.pauseCamera();
-    window.clearInterval(this.timerInterval);
   }
 
   /**
@@ -311,7 +243,6 @@ export class Game {
     }
   }
 
-
   /**
    * Determines if our top 2 matches from the MobileNet is the emoji we are
    * currently looking to find.
@@ -319,110 +250,33 @@ export class Game {
    * @param emojiNameTop2 Second place guess emoji name.
    */
   checkEmojiMatch(emojiNameTop1: string, emojiNameTop2: string) {
-
     // If our top guess is different from when we last checked update the
     // top guess.
+
     if (this.topItemGuess !== emojiNameTop1) {
       this.topItemGuess = emojiNameTop1;
-
-      // As soon as we have a top guess available try to speak so the game
-      // and prediction feels snappy instead of waiting for the 2.5 second
-      // speak delay to speak out the initial guess.
-      if (this.firstSpeak) {
-        let msg = ui.sleuthSpeakingSeeingMsg;
-        ui.setSleuthSpeakerText(msg);
-      }
     }
 
-    if (this.currentEmoji.name === emojiNameTop1 ||
-        this.currentEmoji.name === emojiNameTop2)  {
+    let finder = this.objects.find(element => element.name === emojiNameTop1 || element.name === emojiNameTop2);
+
+    if (finder) {
+      this.foundObject = finder;
       this.emojiFound();
     }
+
   }
 
-  /**
-   * Determines the next emoji that the user will be asked to find using the
-   * gameDifficulty levels to request a level based on how far the user has
-   * progressed in the game.
-   */
-  nextEmoji() {
-
-    if (this.currentLvlIndex === this.gameDifficulty.length) {
-      this.currentLvlIndex = 0;
-    }
-
-    let curLvl = this.gameDifficulty[this.currentLvlIndex];
-    let lvlArray = this.emojiLvlLookup[curLvl];
-    let nextEmoji = lvlArray.shift();
-
-    // If we have selected all possible emojis from a particular level,
-    // reshuffle the list of possible emoji for that level and request a new
-    // next emoji.
-    if (nextEmoji === undefined) {
-      this.reShuffleLevelEmojis(curLvl);
-      lvlArray = this.emojiLvlLookup[curLvl];
-      nextEmoji = lvlArray.shift();
-    }
-
-    this.currentLvlIndex++;
-    this.currentEmoji = nextEmoji;
-
-    ui.setActiveEmoji(this.currentEmoji.path);
-
-    (<any>window).gtag('event', 'Find', {
-      'event_category': 'Emoji',
-      'event_label': `${this.currentEmoji.emoji} - ${this.currentEmoji.name}`
-    });
-  }
-
-  /**
-   * Ensures that the possible list of emoji for each level is shuffled once we
-   * end up selecting all items from a level. This can happen in cases where
-   * we use a large levelDifficulty string that has more items than what we
-   * have for each level or if the game win number is increased beyond the
-   * current 10. Meaning a user can be asked to find a lot more emojis.
-   * @param level The level that we wish to re-shuffle
-   */
-  reShuffleLevelEmojis(level: string) {
-    switch (level) {
-      case '1':
-        this.emojiLvlLookup[level] = shuffle(OBJECTS_LVL_1);
-        break;
-      case '#':
-        // NOTE: the Demo list is not shuffled since we always request them in
-        // same order for demo purposes.
-        this.emojiLvlLookup[level] = Array.from(OBJECTS_LVL_1);
-        break;
-      default:
-        throw new Error('Error: expected ' + level + ' level string in the ' +
-            'level EmojiLevelsLookup');
-    }
-  }
 
   /**
    * Triggers the camera flash and updates the score when we find an emoji.
    */
   emojiFound() {
     this.pauseGame();
-    this.score++;
-    this.emojisFound.push(this.currentEmoji);
+    this.objectsFound.push(this.foundObject);
+    console.log(this.foundObject);
     this.endGamePhotos.push(camera.snapshot())
     ui.cameraFlash();
-
-    let timeToFind = this.timerAtStartOfRound - this.timer;
-    (<any>window).gtag('event', 'Success', {
-      'event_category': 'Emoji',
-      'event_label': `${this.currentEmoji.emoji} - ${this.currentEmoji.name}`,
-      'value': timeToFind
-    });
-
-    if (GAME_MAX_ITEMS === this.score) {
-      ui.showAllItemsFoundView(this.endGamePhotos);
-    } else {
-      setTimeout(() => {
-        ui.showItemFoundView();
-      }, 1000);
-    }
+    ui.showAllItemsFoundView(this.endGamePhotos);
   }
 }
 

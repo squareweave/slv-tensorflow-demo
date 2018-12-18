@@ -20,7 +20,6 @@
 import {game} from './game';
 import {addClass, removeClass} from './classes';
 import {camera} from './camera';
-import {share} from './share';
 import {isMobile, isChromeIOS, getQueryParam} from './utils';
 
 export const VIEWS = {
@@ -29,14 +28,8 @@ export const VIEWS = {
   ABOUT: 'about',
   LANDING: 'landing',
   CAMERA: 'camera',
-  COUNTDOWN: 'countdown',
-  COUNTDOWN3: 'countdown3',
-  COUNTDOWN2: 'countdown2',
-  COUNTDOWN1: 'countdown1',
-  COUNTDOWN0: 'countdown0',
   SLEUTH: 'sleuth',
   FOUND_X_ITEMS: 'foundxitems',
-  FOUND_NO_ITEMS: 'foundnoitems',
   FOUND_ALL_ITEMS: 'foundallitems',
   FOUND_ITEM: 'founditem'
 };
@@ -47,11 +40,6 @@ const SELECTORS = {
   VIEWS_ABOUT: '.view__about--js',
   VIEWS_LANDING: '.view__landing--js',
   VIEWS_CAMERA: '.view__camera--js',
-  VIEWS_COUNTDOWN: '.view__countdown--js',
-  VIEWS_COUNTDOWN3: '.view__countdown__3--js',
-  VIEWS_COUNTDOWN2: '.view__countdown__2--js',
-  VIEWS_COUNTDOWN1: '.view__countdown__1--js',
-  VIEWS_COUNTDOWN0: '.view__countdown__0--js',
   VIEWS_SLEUTH: '.view__sleuth--js',
   VIEWS_FOUND_X_ITEMS: '.view__found-x-items--js',
   VIEWS_FOUND_NO_ITEMS: '.view__found-no-items--js',
@@ -70,13 +58,11 @@ const SELECTORS = {
   SLEUTH_EMOJI: '.view__sleuth__emoji--js',
   SLEUTH_SPEAKING_EL: '.view__sleuth__speaking--js',
   STATUS_BAR_EMOJI_EL: '.view__status-bar__find__emoji--js',
-  COUNTDOWN_EMOJI_EL: '.view__countdown__0__emoji--js',
   CAMERA_FLASH_EL: '.camera__capture-flash--js',
   CAMERA_CAPTURE_EL: '.camera__capture-wrapper--js',
   CAMERA_DESKTOP_MSG_EL: '.view__camera__desktop-msg',
   TIMER_EL: '.view__status-bar__info__timer--js',
   TIMER_FLASH_EL: '.view__status-bar__info__timer-flash--js',
-  TIMER_COUNTDOWN_EL: '.view__countdown__0__find-time-val--js',
   SCORE_EL: '.view__status-bar__info__score--js',
   NR_FOUND_EL: '.view__found-x-items__nr-found--js',
   NR_MAX_FOUND_EL: '.view__found-all-items__nr-found--js',
@@ -90,7 +76,7 @@ const SELECTORS = {
   LANG_SELECTOR_EL: '.view__landing__lang-selector',
 };
 
-const CSS_CLASSES = {
+export const CSS_CLASSES = {
   SLIDE_UP: 'slideUp',
   SLIDE_DOWN: 'slideDown'
 };
@@ -133,13 +119,11 @@ export class Ui {
   sleuthEmojiEl: HTMLImageElement;
   sleuthSpeakingEl: HTMLElement;
   statusBarEmojiEl: HTMLElement;
-  countdownEmojiEl: HTMLImageElement;
   cameraFlashEl: HTMLElement;
   cameraCaptureEl: HTMLElement;
   cameraDesktopMsgEl: HTMLElement;
   timerEl: HTMLElement;
   timerFlashEl: HTMLElement;
-  timerCountdownEl: HTMLElement;
   scoreEl: HTMLElement;
   nrEmojisFoundEl: HTMLElement;
   nrMaxEmojisFoundEl: HTMLElement;
@@ -162,16 +146,9 @@ export class Ui {
       [VIEWS.ABOUT]: document.querySelector(SELECTORS.VIEWS_ABOUT),
       [VIEWS.LANDING]: document.querySelector(SELECTORS.VIEWS_LANDING),
       [VIEWS.CAMERA]: document.querySelector(SELECTORS.VIEWS_CAMERA),
-      [VIEWS.COUNTDOWN]: document.querySelector(SELECTORS.VIEWS_COUNTDOWN),
-      [VIEWS.COUNTDOWN3]: document.querySelector(SELECTORS.VIEWS_COUNTDOWN3),
-      [VIEWS.COUNTDOWN2]: document.querySelector(SELECTORS.VIEWS_COUNTDOWN2),
-      [VIEWS.COUNTDOWN1]: document.querySelector(SELECTORS.VIEWS_COUNTDOWN1),
-      [VIEWS.COUNTDOWN0]: document.querySelector(SELECTORS.VIEWS_COUNTDOWN0),
       [VIEWS.SLEUTH]: document.querySelector(SELECTORS.VIEWS_SLEUTH),
       [VIEWS.FOUND_X_ITEMS]:
           document.querySelector(SELECTORS.VIEWS_FOUND_X_ITEMS),
-      [VIEWS.FOUND_NO_ITEMS]:
-          document.querySelector(SELECTORS.VIEWS_FOUND_NO_ITEMS),
       [VIEWS.FOUND_ALL_ITEMS]:
           document.querySelector(SELECTORS.VIEWS_FOUND_ALL_ITEMS),
       [VIEWS.FOUND_ITEM]: document.querySelector(SELECTORS.VIEWS_FOUND_ITEM)
@@ -191,16 +168,12 @@ export class Ui {
         document.querySelector(SELECTORS.SLEUTH_SPEAKING_EL);
     this.statusBarEmojiEl =
         document.querySelector(SELECTORS.STATUS_BAR_EMOJI_EL);
-    this.countdownEmojiEl =
-        document.querySelector(SELECTORS.COUNTDOWN_EMOJI_EL);
     this.cameraFlashEl = document.querySelector(SELECTORS.CAMERA_FLASH_EL);
     this.cameraCaptureEl = document.querySelector(SELECTORS.CAMERA_CAPTURE_EL);
     this.cameraDesktopMsgEl =
         document.querySelector(SELECTORS.CAMERA_DESKTOP_MSG_EL);
     this.timerEl = document.querySelector(SELECTORS.TIMER_EL);
     this.timerFlashEl = document.querySelector(SELECTORS.TIMER_FLASH_EL);
-    this.timerCountdownEl =
-        document.querySelector(SELECTORS.TIMER_COUNTDOWN_EL);
     this.scoreEl = document.querySelector(SELECTORS.SCORE_EL);
     this.nrEmojisFoundEl = document.querySelector(SELECTORS.NR_FOUND_EL);
     this.nrMaxEmojisFoundEl = document.querySelector(SELECTORS.NR_MAX_FOUND_EL);
@@ -282,6 +255,9 @@ export class Ui {
   /**
    * Registers various UI events for buttons.
    */
+
+
+
   addEvents() {
 
     window.addEventListener('popstate', (event: Event) => {
@@ -303,7 +279,19 @@ export class Ui {
 
       for (const item of Array.from(this.replayGameBtns)) {
         item.addEventListener('click', () => {
-          game.restartGame();
+          game.resetGame();
+          if (this.activeView === VIEWS.FOUND_ALL_ITEMS) {
+            this.resetCameraAfterFlash();
+          }
+          if (this.activeView === VIEWS.FOUND_X_ITEMS ||
+            this.activeView === VIEWS.FOUND_ALL_ITEMS) {
+              removeClass(this.viewsList[this.activeView],
+                  CSS_CLASSES.SLIDE_DOWN);
+          } else {
+            this.hideView(this.activeView);
+          }
+
+          this.showView(VIEWS.LANDING);
 
           (<any>window).gtag('event', 'Click', {
             'event_category': 'Button',
@@ -359,13 +347,13 @@ export class Ui {
 
     if(this.homeBtns.length > 0) {
       for (const item of Array.from(this.homeBtns)) {
+
         item.addEventListener('click', () => {
           game.resetGame();
           if (this.activeView === VIEWS.FOUND_ALL_ITEMS) {
             this.resetCameraAfterFlash();
           }
-          if (this.activeView === VIEWS.FOUND_NO_ITEMS ||
-            this.activeView === VIEWS.FOUND_X_ITEMS ||
+          if (this.activeView === VIEWS.FOUND_X_ITEMS ||
             this.activeView === VIEWS.FOUND_ALL_ITEMS) {
               removeClass(this.viewsList[this.activeView],
                   CSS_CLASSES.SLIDE_DOWN);
@@ -380,28 +368,8 @@ export class Ui {
             'event_label': 'Home'
           });
         });
-      }
-    }
 
-    if(this.aboutBtns.length > 0) {
-      for (const item of Array.from(this.aboutBtns)) {
-        item.addEventListener('click', () => {
-          this.showView(VIEWS.ABOUT);
-          history.pushState({page: 'about'}, 'Emoji Scavenger Hunt - About',
-              '?about=true');
-          (<any>window).gtag('event', 'Click', {
-            'event_category': 'Icon',
-            'event_label': 'About'
-          });
-        });
       }
-    }
-
-    if (this.langSelectorEl) {
-      this.langSelectorEl.addEventListener('change', (e) => {
-        let url = (<HTMLInputElement>e.target).value;
-        window.location.href = url;
-      });
     }
   }
 
@@ -412,8 +380,8 @@ export class Ui {
    */
   get sleuthSpeakingFoundItMsg(): string {
     return `Hey you found <img class="view__sleuth__speaking__emoji"` +
-           `src="${game.currentEmoji.path}"` +
-           `alt="${game.currentEmoji.emoji} icon"/>\u00A0!`;
+           `src="${game.currentEmoji}"` +
+           `alt="${game.currentEmoji} icon"/>\u00A0!`;
   }
 
   /**
@@ -422,17 +390,7 @@ export class Ui {
    * @returns The sleuth found message speak string.
    */
   get sleuthSpeakingFoundItMsgEmojiName(): string {
-    return `Hey you found ${game.currentEmoji.name}\u00A0!`;
-  }
-
-  /**
-   * The message shown and spoken by the sleuth when you find X items.
-   *
-   * @returns You found X items message string.
-   */
-  get sleuthSpeakingFoundXMsg(): string {
-    return `Nice job. You found ${game.score.toString()} ` +
-           `${game.score === 1 ? `item.` : `items.`}`;
+    return `Hey you found ${game.currentEmoji}\u00A0!`;
   }
 
   /**
@@ -452,58 +410,6 @@ export class Ui {
    */
   get sleuthSpeakingFoundAllMsg(): string {
     return 'You did it!';
-  }
-
-  /**
-   * The message shown and spoken when the model sees items in the real world.
-   *
-   * @returns A message constructed with our sleuthSpeakingPrefixes plus some
-   * item seen in the real world.
-   */
-  get sleuthSpeakingSeeingMsg(): string {
-    let randomIndex = Math.floor(this.sleuthSpeakingPrefixes.length *
-        Math.random());
-    return this.sleuthSpeakingPrefixes[randomIndex] +
-           game.topItemGuess.toString() + ' ?';
-  }
-
-  /**
-   * Updates the timer element with the new time remaining.
-   * @param value The value to update the timer UI to.
-   * @param updateCountDownTimer If true is passed in we also update the
-   * countdown view to show how many seconds is remaining.
-   */
-  updateTimer(value: number, updateCountDownTimer = false,
-        addFlashAnimation = false) {
-    if (addFlashAnimation) {
-      this.timerEl.textContent = value.toString();
-      this.timerFlashEl.textContent = value.toString();
-
-      const timerFlashAnimationEnded = (e: Event) => {
-        this.timerFlashEl.style.display = 'none';
-        removeClass(this.timerFlashEl, 'flash');
-        this.timerFlashEl.removeEventListener('animationend',
-            timerFlashAnimationEnded);
-      };
-      this.timerFlashEl.style.display = 'block';
-      this.timerFlashEl.addEventListener('animationend',
-          timerFlashAnimationEnded);
-      addClass(this.timerFlashEl, 'flash');
-    } else {
-      this.timerEl.textContent = value.toString();
-    }
-
-    if (updateCountDownTimer) {
-      this.timerCountdownEl.textContent = value.toString() +
-          `${game.timer === 1 ? ` second.` : ` seconds.`}`;
-    }
-  }
-
-  /**
-   * Updates the score UI.
-   */
-  updateScore() {
-    this.scoreEl.textContent = game.score.toString();
   }
 
   /**
@@ -539,16 +445,6 @@ export class Ui {
   }
 
   /**
-   * Updates the win and end screen UI elements with the amount of emojis found.
-   */
-  setNrEmojisFound() {
-    this.nrEmojisFoundEl.textContent =
-        `${game.score.toString()} ${game.score === 1 ? `item` : `items`}`;
-    this.nrMaxEmojisFoundEl.textContent =
-    `${game.score.toString()} ${game.score === 1 ? `item` : `items`}`;
-  }
-
-  /**
    * Updates the win and end screens UI elements with the list of emojis icons
    * that the user found.
    * @param endGamePhotos An array of images matching the emoji found.
@@ -558,7 +454,6 @@ export class Ui {
       endGamePhotos: Array<HTMLImageElement>, screen: string) {
 
     let emojiFoundString = '';
-    let spacer = '';
 
     let photoContainer = document.createElement('div');
     addClass(photoContainer, 'view__found-x-items__emojis__grid');
@@ -570,26 +465,6 @@ export class Ui {
       addClass(photoContainer, 'portrait');
     }
 
-    for (let i = 0; i < game.emojisFound.length; i++) {
-      let item = game.emojisFound[i];
-      spacer = (i === game.emojisFound.length - 1) ? '' : ' ';
-      emojiFoundString = emojiFoundString + item.emoji + spacer;
-
-      let figure = document.createElement('figure');
-      addClass(figure, 'view__found-x-items__emojis__grid__item');
-      addClass(figure, 'view__found-x-items__emojis__grid__item--js');
-      figure.appendChild(endGamePhotos[i]);
-
-      let caption = document.createElement('figcaption');
-      figure.appendChild(caption);
-
-      let emojiImg = document.createElement('img');
-      emojiImg.src = item.path;
-      emojiImg.alt = item.name;
-      caption.appendChild(emojiImg);
-
-      photoContainer.appendChild(figure);
-    }
 
     while (this.emojisFoundListEl.firstChild) {
       this.emojisFoundListEl.removeChild(this.emojisFoundListEl.firstChild);
@@ -600,7 +475,7 @@ export class Ui {
           this.emojisMaxFoundListEl.firstChild);
     }
 
-    addClass(photoContainer, 'photos-' + game.emojisFound.length);
+    addClass(photoContainer, 'photos-' + 3);
 
     this.emojisFoundListEl.appendChild(photoContainer.cloneNode(true));
     this.emojisMaxFoundListEl.appendChild(photoContainer);
@@ -611,19 +486,18 @@ export class Ui {
     });
 
     // Also update the twitter sharing links with the list of emojis
-    share.setTwitterShareLinks(emojiFoundString);
+    //share.setTwitterShareLinks(emojiFoundString);
   }
 
   /**
    * Resets the UI after an emoji was found and shows the UI for the next emoji.
    */
   nextEmojiBtnClick() {
-    game.nextEmoji();
     this.resetSleuthSpeakerText();
     this.hideSleuthSpeakerText();
-    this.showCountdown();
     this.resetCameraAfterFlash();
     this.hideView(VIEWS.FOUND_ITEM);
+    game.resumeGame();
   }
 
   /**
@@ -669,7 +543,6 @@ export class Ui {
    */
   setActiveEmoji(emojiPath: string) {
     this.statusBarEmojiEl.textContent = emojiPath;
-    this.countdownEmojiEl.src = emojiPath;
   }
 
   /**
@@ -706,20 +579,6 @@ export class Ui {
    */
   showItemFoundView() {
     this.showView(VIEWS.FOUND_ITEM);
-    this.updateScore();
-  }
-
-  /**
-   * Triggers the actions related to the game ending with the user having found
-   * no emojis. NOTE this view slides in from the top and doesn't simply
-   * display like other views.
-   */
-  showNoItemsFoundView() {
-    game.pauseGame();
-    let msg = this.sleuthSpeakingFoundNoMsg;
-    this.setSleuthSpeakerText(msg);
-    this.setActiveView(VIEWS.FOUND_NO_ITEMS);
-    this.slideView(VIEWS.FOUND_NO_ITEMS, CSS_CLASSES.SLIDE_DOWN, false)
   }
 
   /**
@@ -730,10 +589,10 @@ export class Ui {
    */
   showXItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
     game.pauseGame();
-    this.setNrEmojisFound();
+
     this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.END);
-    let msg = this.sleuthSpeakingFoundXMsg;
-    this.setSleuthSpeakerText(msg);
+    //let msg = this.sleuthSpeakingFoundXMsg;
+    //this.setSleuthSpeakerText(msg);
     this.setActiveView(VIEWS.FOUND_X_ITEMS);
     this.slideView(VIEWS.FOUND_X_ITEMS, CSS_CLASSES.SLIDE_DOWN, false)
   }
@@ -747,7 +606,6 @@ export class Ui {
   showAllItemsFoundView(endGamePhotos: Array<HTMLImageElement>) {
     game.pauseGame();
 
-    this.setNrEmojisFound();
     this.setEmojisFoundList(endGamePhotos, GAME_OUTCOME.WIN);
 
     let msg = this.sleuthSpeakingFoundAllMsg;
@@ -785,82 +643,17 @@ export class Ui {
     });
   }
 
-  /**
-   * The countdown logic that after a second has passed hides the current
-   * countdown view or triggers the game start if we are at the last countdown.
-   * (3 - 2 - 1 - 0).
-   * @param count The current countdown view.
-   *
-   * @returns A Promise that resolves roughly after a second has passed.
-   */
-  countDown(count: string) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        this.setActiveView(count);
-        if (count === VIEWS.COUNTDOWN0) {
-          camera.unPauseCamera();
-
-          this.slideView(count, CSS_CLASSES.SLIDE_UP).then(value => {
-            if (!game.isRunning) {
-              game.startGame();
-            }
-
-            this.resetCountDownUi();
-            this.setActiveView(VIEWS.CAMERA);
-          });
-        } else {
-          this.hideView(count);
-        }
-        resolve(count);
-      }, 1000);
-    });
+  showCamera() {
+    this.hideView(VIEWS.LANDING);
+    this.hideView(VIEWS.LOADING);
+    //this.hideView(VIEWS.FOUND_ALL_ITEMS);
+    if (!game.isRunning) {
+      game.startGame();
+    }
+    this.showView(VIEWS.CAMERA);
+    this.setActiveView(VIEWS.CAMERA);
   }
 
-  /**
-   * Resets the countdown views.
-   */
-  resetCountDownUi() {
-    this.hideView(VIEWS.COUNTDOWN);
-    this.showView(VIEWS.COUNTDOWN0);
-  }
-
-  /**
-   * Shows the countdown view.
-   *
-   * @async
-   */
-  async showCountdown() {
-
-    // For performance reasons we should always call the countdown while the
-    // predict engine is not running. We pause the game while the countdown is
-    // running because the final countdown screen will set the game state back
-    // to running.
-    if (game.isRunning) {
-      game.isRunning = false;
-    }
-
-    //this.updateTimer(game.timer, true);
-
-    if (this.activeView === VIEWS.LANDING ||
-        this.activeView === VIEWS.LOADING) {
-      this.hideView(VIEWS.LANDING);
-      this.hideView(VIEWS.LOADING);
-    }
-
-    // We triggered this countdown from one of the Found states using the
-    // "Play again" btn and thus need to reset their slide transition so they
-    // are ready to be used again.
-    if (this.activeView === VIEWS.FOUND_NO_ITEMS ||
-      this.activeView === VIEWS.FOUND_X_ITEMS ||
-      this.activeView === VIEWS.FOUND_ALL_ITEMS) {
-        removeClass(this.viewsList[this.activeView], CSS_CLASSES.SLIDE_DOWN);
-    }
-    this.showView(VIEWS.COUNTDOWN);
-
-    // This await logic ensures that each countdown view which returns a promise
-    // blocks until each view resolves in the 1 second countdown time.
-    await this.countDown(VIEWS.COUNTDOWN0);
-  }
 
   /**
    * Resets the scroll position of any scrollable elements.
@@ -869,6 +662,16 @@ export class Ui {
      this.viewsList[VIEWS.FOUND_ALL_ITEMS].scrollTop = 0;
      this.viewsList[VIEWS.FOUND_X_ITEMS].scrollTop = 0;
    }
+
+  resetCssClasses() {
+    // We triggered this countdown from one of the Found states using the
+    // "Play again" btn and thus need to reset their slide transition so they
+    // are ready to be used again.
+    if (this.activeView === VIEWS.FOUND_X_ITEMS ||
+      this.activeView === VIEWS.FOUND_ALL_ITEMS) {
+        removeClass(this.viewsList[this.activeView], CSS_CLASSES.SLIDE_UP);
+    } 
+  }
 }
 
 export let ui = new Ui();
