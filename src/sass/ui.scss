@@ -17,6 +17,7 @@
  */
 
 @import 'vars';
+@import 'mixins';
 
 /*
  * Z-index UI application
@@ -87,13 +88,49 @@ body {
   font-family: $display-font;
   text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
-  background: #87ca72 url(../img/camera.png) no-repeat 10px 50%;
-  background-size:20px 20px;
+  background: #87ca72;
   border:2px solid #64ad4b;
-  padding: 10px 25px 10px 40px;
+  padding: 10px 25px;
   font-size: 20px;
   font-weight: bold;
   font-style: normal;
+}
+.play-btn{
+    background: #87ca72 url(../img/camera.png) no-repeat 10px 50%;
+    background-size:20px 20px;
+    padding: 10px 25px 10px 40px;
+}
+
+.capture-btn{
+    position: absolute;
+    bottom: 40px;
+    z-index: 500;
+    font-size: 32px;
+    background: #ffffff;
+    border: 0;
+    font-family: $display-font;
+    left: 50%;
+    padding: 10px 20px;
+    border-radius:3px;
+    transform: translate(-50%,0);
+    &:after{
+        position:absolute;
+        left:0;
+        width:0;
+        top:0;
+        bottom:0;
+        background:#82d282;
+        z-index:$zindex-neg;
+        border-radius:3px;
+        content: " ";
+        display:block;
+    }
+}
+.capture-btn--animate{
+    &:after{
+        width:100%;
+        transition:2s width ease-in-out;
+    }
 }
 
 .play-btn:disabled {
@@ -107,6 +144,7 @@ body {
 
 .cancel-btn {
   background: $c-grey;
+  border-color:darken($c-grey, 10%);
   margin-bottom: 15px;
 }
 
@@ -153,7 +191,7 @@ body {
   padding: 5px;
   padding: 15px;
   background: #000;
-
+    z-index:$zindex-5--status-bar-layer;
   &__home-btn,
   &__about-btn,
   &__close-btn {
@@ -198,17 +236,16 @@ body {
 
   &__heading {
     font-family: $display-font;
-    font-size: 30px;
-    text-transform: uppercase;
+    font-size: 20px;
     margin: 0;
-    letter-spacing: 1px;
+    font-weight:bold;
   }
 }
 
 .view__loading {
   position: absolute;
   color: $c-white;
-  background-color: $c-red;
+  background-color: #000000;
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -218,7 +255,9 @@ body {
   height: 100%;
   top: 0;
   z-index: $zindex-13--loading-layer;
-
+    svg path{
+        fill: #ffffff;
+    }
   &__icon {
     width: 70px;
   }
@@ -232,7 +271,7 @@ body {
 .view__quit {
   position: absolute;
   color: $c-white;
-  background-color: $c-purple;
+  background-color: #000000;
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -592,33 +631,7 @@ body {
   z-index: $zindex-8--sleuth-layer;
   left:0;
   right:0;
-  padding:20px 0;
   background:#000;
-
-  &__emoji {
-    position: relative;
-    bottom: -4px;
-    align-self: flex-end;
-    width: 75px;
-
-    @include bp(s) {
-      width: 100px;
-    }
-
-    @include bp(ls) {
-      width: 80px;
-    }
-  }
-
-  &__speaking {
-    display: none;
-    position: relative;
-    font-size: 16px;
-    margin:0;
-    text-align: center;
-    width:100%;
-    color:white;
-  }
 }
 
 .view__found-x-items,
@@ -654,7 +667,7 @@ body {
     padding-top: 30px;
   }
 
-  &__emojis {
+  &__objects {
     display: flex;
     font-size: 16px;
     font-weight:bold;
@@ -692,7 +705,7 @@ body {
       flex-wrap: wrap;
       max-width: 960px;
       padding: 5px;
-      width: 100%;
+        background:#e3ffe3;
 
       figure {
 
@@ -881,12 +894,15 @@ body {
     cursor: pointer;
     padding: 0;
     position: absolute;
-    top: 74px;
-    right: 14px;
-    font-size: 22px;
+    top: 20px;
+    right: 20px;
+    font-size: 20px;
     font-family: $display-font;
     text-transform: uppercase;
     z-index: $zindex-3--camera-quit-btn-layer;
+    border: 1px solid white;
+    border-radius: 4px;
+    padding:5px 10px;
   }
 
   &__prediction-results {
@@ -913,8 +929,10 @@ body {
     font-size: 14px;
     font-weight: 400;
     position: absolute;
-    bottom: 15px;
-    right: 14px;
+    bottom: -5px;
+    left: 50%;
+    z-index: 300;
+    transform: translate(-50%,0);
     z-index: $zindex-3--camera-quit-btn-layer;
   }
 }
