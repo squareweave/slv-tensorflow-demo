@@ -25,9 +25,13 @@ import {getQueryParam, isIOS} from './utils';
 import * as tfc from '@tensorflow/tfjs-core';
 import {ExhibitItem, OBJECTS} from './game_levels';
 
+export interface Reference {
+    [index: string] : Array<Number>
+}
 interface CameraDimensions {
   [index: number]: number;
 }
+
 
 /** Manages game state and various tasks related to game events. */
 export class Game {
@@ -40,43 +44,41 @@ export class Game {
   foundObject: ExhibitItem;
   /** Speak interval for reading out objects from the camera every x seconds. */
   speakInterval: number;
-  /**
-   * The current top ranked item the model has predicted and identified from
-   * the camera.
-   */
-  topItemGuess: string;
-  currentObject: string;
   /** An array of snapshots taken when the model finds an emoji. */
   endGamePhotos: Array<HTMLImageElement>;
   debugMode = false;
   gameIsPaused = false;
   firstRun = true;
   stats: Stats;
-
+  resultObj: Reference;
   constructor() {
     this.objectScavengerMobileNet = new MobileNet();
     this.isRunning = false;
     this.cameraPaused = false;
     this.endGamePhotos = [];
     this.objectsFound = [];
-    this.topItemGuess = null;
-    this.currentObject = 'derrick';
+    this.resultObj = {}; 
     this.objects = Array.from(OBJECTS);
-    if (getQueryParam('debug') === 'true') {
-      this.debugMode = true;
-    }
-  }
-  /**
-   * Ensures the MobileNet prediction model in tensorflow.js is ready to
-   * accept data when we need it by triggering a predict call with zeros to
-   * preempt the predict tensor setups.
-   */
-  warmUpModel() {
-    this.objectScavengerMobileNet.predict(
-        tfc.zeros([VIDEO_PIXELS, VIDEO_PIXELS, 3]));
   }
 
-  /**
+  averageObjects() {
+    for (var key in this.resultObj) {
+        if (this.resultObj.hasOwnProperty(key)) {
+            let test = this.resultObj[key].reduce((accumulator: number, currentValue: number) => accumulator + currentValue);
+            let average = (Number(test) / this.resultObj[key].length);
+            //todo: fix up this confidence depending on the objects and their relative complexities.
+            if (average > 0.94) {
+                this.objects.map((el) => {
+                    if (el.name === key) {
+                        this.foundObject = el;
+                        this.objectFound();
+                    }
+                });
+            }
+        } 
+     }
+  }
+   /**
    * The game MobileNet predict call used to identify content from the camera
    * and make predictons about what it is seeing.
    * @async
@@ -86,11 +88,7 @@ export class Game {
     // Only do predictions if the game is running, ensures performant view
     // transitions and saves battery life when the game isn't in running mode.
     if (this.isRunning) {
-
-      if(this.debugMode) {
-        this.stats.begin();
-      }
-
+        
       // Run the tensorflow predict logic inside a tfc.tidy call which helps
       // to clean up memory from tensorflow calls once they are done.
       const result = tfc.tidy(() => {
@@ -115,10 +113,18 @@ export class Game {
       // This call retrieves the topK matches from our MobileNet for the
       // provided image data.
       const topK =
-          await this.objectScavengerMobileNet.getTopKClasses(result, 10);
+          await this.objectScavengerMobileNet.getTopKClasses(result, 2);
 
       // Match the top 2 matches against our current active emoji.
-      this.checkObjectMatch(topK[0].label, topK[1].label);
+      for (const item of topK) {
+          if (!this.resultObj.hasOwnProperty(item.label)) {
+              this.resultObj[item.label] = [];
+          }
+      }
+
+      for (const item of topK) {
+        this.resultObj[item.label].push(item.value);
+      }
 
       // if ?debug=true is passed in as a query param show the topK classes
       // on screen to help with debugging.
@@ -131,6 +137,12 @@ export class Game {
                 `${item.value.toFixed(5)}: ${item.label}\n`;
         }
       }
+
+    } else {
+        if (this.debugMode) {
+            ui.predictionResultsEl.style.display = 'none';
+            ui.predictionResultsEl.innerText = '';
+        }
     }
 
     if(this.debugMode) {
@@ -142,6 +154,18 @@ export class Game {
     requestAnimationFrame(() => this.predict());
   }
 
+
+  /**
+   * Ensures the MobileNet prediction model in tensorflow.js is ready to
+   * accept data when we need it by triggering a predict call with zeros to
+   * preempt the predict tensor setups.
+   */
+  warmUpModel() {
+    this.objectScavengerMobileNet.predict(
+        tfc.zeros([VIDEO_PIXELS, VIDEO_PIXELS, 3]));
+  }
+
+ 
   /**
    * Initializes the game and sets up camera and MobileNet access. Once ready
    * shows the countdown to start the game.
@@ -149,14 +173,15 @@ export class Game {
   initGame() {
     if (this.firstRun) {
 
-      if(this.debugMode) {
+      ui.showView(VIEWS.LOADING);
+
+      if (getQueryParam('debug') === 'true') {
+        this.debugMode = true;
         this.stats = new Stats();
         this.stats.dom.style.position = 'relative';
         this.stats.showPanel(0);
         ui.cameraFPSEl.appendChild(this.stats.dom);
-      }
-
-      ui.showView(VIEWS.LOADING);
+    }
 
       Promise.all([
         this.objectScavengerMobileNet.load().then(() => this.warmUpModel()),
@@ -164,17 +189,11 @@ export class Game {
           camera.setupVideoDimensions(value[0], value[1]);
         }),
       ]).then(values => {
-        // Both the MobileNet and the camera has been loaded.
-        // We can start the game by starting the predict engine and showing the
-        // game countdown.
-        // NOTE the predict engine will only do calculations if game.isRunning
-        // is set to true. We trigger that inside our countdown Promise.
         this.firstRun = false;
         this.predict();
         ui.showCamera();
       }).catch(error => {
         ui.startGameBtn.style.display = 'none';
-        ui.ageDisclaimerMsgEl.style.display = 'none';
         ui.hideView(VIEWS.LOADING);
 
         // iOS does not provide access to mediaDevices.getUserMedia via
@@ -198,6 +217,18 @@ export class Game {
     }
   }
 
+  collectPredictions() {
+    this.resultObj = {};
+    if (!this.isRunning) {
+        this.startGame();
+    }
+  }
+
+  reportPredictions() {
+    this.isRunning = false;
+    this.averageObjects()
+  }
+
   /**
    * Starts the game by setting the game to running, playing audio and
    * registering the game timer and speech intervals.
@@ -205,10 +236,6 @@ export class Game {
   startGame() {
     camera.unPauseCamera();
     this.isRunning = true;
-    this.speakInterval = window.setInterval(() => {
-      let msg = ui.sleuthSpeakingSeeingMsg;
-      ui.setSleuthSpeakerText(msg);
-    }, 500);
   }
 
   /**
@@ -217,12 +244,7 @@ export class Game {
   resetGame() {
     ui.resetScrollPositions();
     this.pauseGame();
-    this.topItemGuess = null;
     this.endGamePhotos = [];
-
-    ui.resetSleuthSpeakerText();
-    ui.hideSleuthSpeakerText();
-
   }
 
   /**
@@ -232,7 +254,6 @@ export class Game {
     this.gameIsPaused = true;
     this.isRunning = false;
     camera.pauseCamera();
-    window.clearInterval(this.speakInterval);
   }
 
   /**
@@ -242,29 +263,6 @@ export class Game {
     if (this.gameIsPaused) {
       this.startGame();
     }
-  }
-
-  /**
-   * Determines if our top 2 matches from the MobileNet is the object we are
-   * currently looking to find.
-   * @param objectTop1 Top guess name.
-   * @param objectTop2 Second place guess  name.
-   */
-  checkObjectMatch(objectTop1: string, objectTop2: string) {
-    // If our top guess is different from when we last checked update the
-    // top guess.
-
-    if (this.topItemGuess !== objectTop1) {
-      this.topItemGuess = objectTop1;
-    }
-
-    let finder = this.objects.find(element => element.name === objectTop1 || element.name === objectTop2);
-
-    if (finder) {
-      this.foundObject = finder;
-      this.objectFound();
-    }
-
   }
 
   /**

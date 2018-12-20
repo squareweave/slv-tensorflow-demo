@@ -22,14 +22,9 @@ export interface ExhibitItem {
 
 export const OBJECTS: Array<ExhibitItem> = [
   {
-    'name': 'hand',
-    'emoji': '✋',
-    'path': 'Hand'
+    'name': 'pig',
   },
   {
-    'name': 'sunglasses',
-    'emoji': '🕶',
-    'path': 'Sunglasses'
+    'name': 'keyboard',
   },
-  
 ]; 

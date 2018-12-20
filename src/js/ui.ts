@@ -50,6 +50,7 @@ const SELECTORS = {
   REPLAY_GAME_BTN: '.play-again-btn--js',
   CLOSE_BTN: '.view__info-bar__close-btn--js',
   ABOUT_BTN: '.view__info-bar__about-btn--js',
+  CAPTURE_BTN: '.capture-btn--js',
   HOME_BTN: '.view__info-bar__home-btn--js',
   CAMERA_QUIT_BTN: '.view__camera__quit-btn--js',
   QUIT_CANCEL_BTN: '.quit-cancel-btn--js',
@@ -87,16 +88,16 @@ const GAME_OUTCOME = {
 };
 
 export const GAME_STRINGS = {
-  CAMERA_NO_ACCESS: 'Hey! To play you’ll need to enable camera access in ' +
-      'your browser address bar 👆. Your camera is how you’ll ' +
-      'find objects in the real world. We won’t store any ' +
-      'images from your camera. 👍',
-  SAFARI_WEBVIEW: '🚨 To play this game, please open it directly in Safari. ' +
-      'If needed, copy/paste or type the URL into the address bar. ' +
-      'https://g.co/objectscavengerhunt 🚨',
-  CAMERA_GENERAL_ERROR: 'It looks like your browser or device doesn’t ' +
-      'support this experiment. It’s designed to work best ' +
-      'on mobile (iOS/Safari or Android/Chrome). 😭'
+  CAMERA_NO_ACCESS: `Hey! To play you’ll need to enable camera access in 
+      your browser address bar 👆. Your camera is how you’ll
+      find objects in the real world. We won’t store any 
+      images from your camera. 👍`,
+  SAFARI_WEBVIEW: `🚨 To play this game, please open it directly in Safari. 
+      If needed, copy/paste or type the URL into the address bar. 
+      https://g.co/objectscavengerhunt 🚨`,
+  CAMERA_GENERAL_ERROR: `It looks like your browser or device doesn’t 
+      support this experiment. It’s designed to work best 
+      on mobile (iOS/Safari or Android/Chrome). 😭`
 };
 
 export interface ViewsListTypes {
@@ -134,6 +135,7 @@ export class Ui {
   landingInfoMsgEl: HTMLElement;
   ageDisclaimerMsgEl: HTMLElement;
   cameraFPSEl: HTMLElement;
+  captureBtn: HTMLButtonElement;
   langSelectorEl: HTMLElement;
   sleuthSpeakingPrefixes: Array<string>;
   activeView: string;
@@ -170,6 +172,7 @@ export class Ui {
         document.querySelector(SELECTORS.STATUS_BAR_object_EL);
     this.cameraFlashEl = document.querySelector(SELECTORS.CAMERA_FLASH_EL);
     this.cameraCaptureEl = document.querySelector(SELECTORS.CAMERA_CAPTURE_EL);
+    this.captureBtn = document.querySelector(SELECTORS.CAPTURE_BTN)
     this.cameraDesktopMsgEl =
         document.querySelector(SELECTORS.CAMERA_DESKTOP_MSG_EL);
     this.timerEl = document.querySelector(SELECTORS.TIMER_EL);
@@ -234,7 +237,6 @@ export class Ui {
         this.startGameBtn.disabled = true;
         addClass(this.viewsList[VIEWS.LANDING], 'not-supported');
         this.landingPlatformMsgEl.style.display = 'block';
-        this.ageDisclaimerMsgEl.style.display = 'none';
       }
     } else {
       this.landingDesktopMsgEl.style.display = 'block';
@@ -255,9 +257,6 @@ export class Ui {
   /**
    * Registers various UI events for buttons.
    */
-
-
-
   addEvents() {
 
     window.addEventListener('popstate', (event: Event) => {
@@ -267,13 +266,15 @@ export class Ui {
     if (this.startGameBtn) {
       this.startGameBtn.addEventListener('click', () => {
         game.initGame();
-
-        (<any>window).gtag('event', 'Click', {
-          'event_category': 'Button',
-          'event_label': 'Let\'s Play'
-        });
       });
     }
+
+    if (this.captureBtn) {
+        this.captureBtn.addEventListener('click', () => {
+          this.capture();
+        });
+      }
+      
 
     if(this.replayGameBtns.length > 0) {
 
@@ -293,10 +294,6 @@ export class Ui {
 
           this.showView(VIEWS.LANDING);
 
-          (<any>window).gtag('event', 'Click', {
-            'event_category': 'Button',
-            'event_label': 'Play Again'
-          });
         });
       }
     }
@@ -310,11 +307,6 @@ export class Ui {
       this.cameraQuitBtn.addEventListener('click', () => {
         game.pauseGame();
         this.showView(VIEWS.QUIT);
-
-        (<any>window).gtag('event', 'Click', {
-          'event_category': 'Link',
-          'event_label': 'Quit (in-game)'
-        });
       });
     }
 
@@ -330,11 +322,6 @@ export class Ui {
         game.resetGame();
         this.hideView(VIEWS.QUIT);
         this.showView(VIEWS.LANDING);
-
-        (<any>window).gtag('event', 'Click', {
-          'event_category': 'Link',
-          'event_label': 'Quit (confirm)'
-        });
       });
     }
 
@@ -362,88 +349,9 @@ export class Ui {
           }
 
           this.showView(VIEWS.LANDING);
-
-          (<any>window).gtag('event', 'Click', {
-            'event_category': 'Icon',
-            'event_label': 'Home'
-          });
         });
-
       }
     }
-  }
-
-  /**
-   * The found message shown in the sleuth UI which includes an object icon.
-   *
-   * @returns The sleuth found message display string.
-   */
-  get sleuthSpeakingFoundItMsg(): string {
-    return `Hey you found ${game.foundObject}`;
-  }
-
-  /**
-   * The message shown and spoken when your time is up and you haven't found
-   * any items.
-   *
-   * @returns Your time is up message string.
-   */
-  get sleuthSpeakingFoundNoMsg(): string {
-    return 'Oh no! Your time is up.';
-  }
-
-  /**
-   * The message shown and spoken when you win the game.
-   *
-   * @returns You did it message string.
-   */
-  get sleuthSpeakingFoundAllMsg(): string {
-    return 'You did it!';
-  }
-
- /**
-   * The message shown and spoken when the model sees items in the real world.
-   *
-   * @returns A message constructed with our sleuthSpeakingPrefixes plus some
-   * item seen in the real world.
-   */
-  get sleuthSpeakingSeeingMsg(): string {
-    let randomIndex = Math.floor(this.sleuthSpeakingPrefixes.length *
-        Math.random());
-    return this.sleuthSpeakingPrefixes[randomIndex] +
-           game.topItemGuess.toString() + ' ?';
-  }
-
-  /**
-   * Sets the sleuth UI element text.
-   * @param msg The message to update the speaker text to.
-   * @param msgMarkup If true the message contains markup and we set that
-   * directly.
-   */
-  setSleuthSpeakerText(msg: string, msgMarkup = false) {
-
-    if (msgMarkup) {
-      this.sleuthSpeakingEl.innerHTML = msg;
-    } else {
-      this.sleuthSpeakingEl.textContent = msg;
-    }
-
-    this.sleuthSpeakingEl.style.display = 'block';
-  }
-
-  /**
-   * Resets the sleuth speaker text.
-   */
-  resetSleuthSpeakerText() {
-    this.sleuthSpeakingEl.textContent = '';
-  }
-
-  /**
-   * Hides the sleuth speaker UI element.
-   */
-  hideSleuthSpeakerText() {
-    this.sleuthSpeakingEl.style.display = 'none';
-    this.sleuthSpeakingEl.textContent = '';
   }
 
   /**
@@ -484,7 +392,7 @@ export class Ui {
       caption.innerText = `You found the ${item.name}!`;
 
       photoContainer.appendChild(figure);
-     console.log(this.objectsFoundListEl);
+
       while (this.objectsFoundListEl.firstChild) {
         this.objectsFoundListEl.removeChild(this.objectsFoundListEl.firstChild);
       }
@@ -505,8 +413,6 @@ export class Ui {
    * Resets the UI after an object was found and shows the UI for the next object.
    */
   nextobjectBtnClick() {
-    this.resetSleuthSpeakerText();
-    this.hideSleuthSpeakerText();
     this.resetCameraAfterFlash();
     this.hideView(VIEWS.FOUND_ITEM);
     game.resumeGame();
@@ -603,12 +509,29 @@ export class Ui {
     game.pauseGame();
 
     this.setobjectsFoundList(endGamePhotos, GAME_OUTCOME.WIN);
-
-    let msg = this.sleuthSpeakingFoundAllMsg;
-    this.setSleuthSpeakerText(msg);
-
     this.setActiveView(VIEWS.FOUND_ALL_ITEMS);
     this.slideView(VIEWS.FOUND_ALL_ITEMS, CSS_CLASSES.SLIDE_DOWN, false);
+  }
+
+
+  capture() {
+    const btn = ui.captureBtn;
+    return new Promise(resolve => {
+        const transitionEnded = (e: Event) => {
+            removeClass(btn, 'capture-btn--animate');
+            btn.disabled = false;
+            btn.innerText = "Capture";
+            game.reportPredictions();
+            btn.removeEventListener('transitionend', transitionEnded);
+            resolve(true);
+        };
+
+        btn.addEventListener('transitionend', transitionEnded);
+        game.collectPredictions();
+        addClass(btn, 'capture-btn--animate');
+        btn.disabled = true;
+        btn.innerText = "Capturing..."
+    });
   }
 
   /**
@@ -642,15 +565,9 @@ export class Ui {
   showCamera() {
     this.hideView(VIEWS.LANDING);
     this.hideView(VIEWS.LOADING);
-    //this.hideView(VIEWS.FOUND_ALL_ITEMS);
-    if (!game.isRunning) {
-      game.startGame();
-    }
     this.showView(VIEWS.CAMERA);
     this.setActiveView(VIEWS.CAMERA);
   }
-
-
   /**
    * Resets the scroll position of any scrollable elements.
    */

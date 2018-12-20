@@ -81,7 +81,6 @@ export class Camera {
    */
   setupVideoDimensions(width: number, height: number) {
     this.aspectRatio = width / height;
-
     if (width >= height) {
       this.videoElement.height = VIDEO_PIXELS;
       this.videoElement.width = this.aspectRatio * VIDEO_PIXELS;
