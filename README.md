@@ -38,9 +38,8 @@ In chrome, the webcam should work as long as you are using localhost as your bas
 
 To setup the app over https we've created the guide that follows. You also won't get all the reloading nicities - you'll be running the dev server from the `dist` folder, separate from the `dev_server.py` method of development.
 
-1. Generate the app with `yarn build`
-2. Run `yarn dist:test`
-3. It should now be possible to access the app over your local network at the browser-sync outputted 'External' address in iOS safari, and have the camera work. 
+1. Run `dist:server`
+2. It should now be possible to access the app over your local network at the browser-sync outputted 'External' address in iOS safari, and have the camera work. 
 
 ## Build your own model
 You can build your own image recognition model by running a Docker container.
