@@ -25,6 +25,7 @@
     "browserify": "^16.0.0",
     "browserify-shim": "^3.8.14",
     "concurrently": "^3.5.1",
+    "http-server": "^0.11.1",
     "lodash": "^4.17.5",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.7.2",
