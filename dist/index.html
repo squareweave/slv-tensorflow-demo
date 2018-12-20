@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="google-site-verification" content="lD484N--aDigkknKdhFozMC6Iyhydvzv5reMGNpgleI" />
     <link rel="canonical" href="https://emojiscavengerhunt.withgoogle.com/">
-    <title>Emoji Scavenger Hunt</title>
+    <title>Exhibition Explorer</title>
     <meta name="description" content="Use your phone’s camera to identify emojis in the real world. Can you find all the emojis before time expires?" />
 
-    <meta itemprop="name" content="Emoji Scavenger Hunt" />
+    <meta itemprop="name" content="Exhibition Explorer" />
     <meta itemprop="description" content="Use your phone’s camera to identify emojis in the real world. Can you find all the emojis before time expires?" />
     <meta itemprop="image" content="https://emojiscavengerhunt.withgoogle.com/img/share.jpg" />
 
@@ -16,10 +16,8 @@
     <link rel="apple-touch-icon-precomposed" href="/img/favicon-152.png">
     <link rel="shortcut icon" sizes="192x192" href="/img/favicon-192.png">
 
-    <meta property="og:title" content="Emoji Scavenger Hunt" />
+    <meta property="og:title" content="Exhibition Explorer" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://emojiscavengerhunt.withgoogle.com/" />
-    <meta property="og:image" content="https://emojiscavengerhunt.withgoogle.com/img/share.jpg" />
     <meta property="og:description" content="Use your phone’s camera to identify emojis in the real world. Can you find all the emojis before time expires?" />
 
     <meta name="twitter:card" content="summary_large_image" />
@@ -36,7 +34,17 @@
     
     <div class="views">
       <div class="view__loading view__loading--js">
-        <img class="view__loading__icon" src="/img/loading.gif" alt="Loading magnifying glass">
+        <div class="loading-svg">
+            <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+                <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+                  s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+                  c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"></path>
+                <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+                  C22.32,8.481,24.301,9.057,26.013,10.047z" transform="rotate(11.2363 20 20)">
+                  <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite"></animateTransform>
+                  </path>
+            </svg>
+        </div>
         <p class="views__heading view__loading__heading">Loading ...</p>
       </div>
 
@@ -56,12 +64,6 @@
         <p class="view__landing__desktop-msg view__landing__desktop-msg--js">This demo works best on mobile phones.</p>
         <div class="view__landing__triangle"></div>
     </div>
-
-      <div class="view__sleuth view__sleuth--js">
-       <!--<img class="view__sleuth__emoji view__sleuth__emoji--js" src="/img/emojis/ui/sleuth.svg" alt="Sleuth emoji" />-->
-        <p class="view__sleuth__speaking view__sleuth__speaking--js"></p>
-      </div>
-
       <div class="view__found-x-items view__found-x-items--js">
         <div class="view__info-bar">
           <button class="view__info-bar__home-btn play-btn view__info-bar__home-btn--js" >
@@ -70,7 +72,7 @@
         </div>
         <div class="view__found-x-items__emojis view__found-x-items__objects--js"></div>
         <p class="view__found-x-items__disclaimer">Your photos are not being saved and will remain local on your device.</p>
-        <button class="btn play-again-btn--js">Play Again</button>
+        <button class="btn play-again-btn--js">Find Again</button>
       </div>
 
       <div class="view__found-all-items view__found-all-items--js">
@@ -82,50 +84,29 @@
         <div class="view__found-all-items__objects view__found-all-items__objects--js"></div>
         <p class="view__found-all-items__disclaimer">Your photos are not being saved and will remain local on your device.</p>
       
-        <button class="btn play-again-btn--js">Play Again</button>
+        <button class="btn play-again-btn--js">Find Again</button>
       </div>
 
-      <div class="view__found-no-items view__found-no-items--js">
-        <div class="view__info-bar">
-          <button class="view__info-bar__home-btn view__info-bar__home-btn--js" >
-            <img src="/img/emojis/ui/house.svg" alt="Home icon">
-          </button>
-          <button class="view__info-bar__about-btn view__info-bar__about-btn--js">
-            <img src="/img/emojis/ui/info.svg" alt="About icon">
-          </button>
-        </div>
-        <img class="view__found-no-items__emoji" src="/img/emojis/ui/thumbsdown.svg"/>
-        <p>You didn’t find any items.</p>
-        <button class="btn play-again-btn--js">Play Again</button>
-      </div>
-
-      <div class="view__status-bar view__status-bar--js">
-        <div class="view__status-bar__find">Find
-            <p class="view__status-bar__find__emoji view__status-bar__find__emoji--js"></p>
-        </div>
-        
-      </div>
+      <div class="view__info-bar">
+        <button class="view__info-bar__home-btn view__info-bar__home-btn--js">
+                <img src="/img/slv-white.png" alt="Home icon">
+        </button>
+        <button class="view__camera__quit-btn view__camera__quit-btn--js">Quit</button>
+     </div>
 
       <div class="view__camera view__camera--js">
-        <button class="view__camera__quit-btn view__camera__quit-btn--js">Quit</button>
         <div class="view__camera__prediction-results view__camera__prediction-results--js"></div>
         <div class="view__camera__fps view__camera__fps--js"></div>
         <p class="view__camera__desktop-msg view__camera__desktop-msg--js">This is best experienced on phones</p>
         <div class="camera__capture-wrapper camera__capture-wrapper--js">
           <div class="camera__capture-flash camera__capture-flash--js"></div>
           <video class="camera__element camera__element--js" autoplay playsinline></video>
+          <button class="capture-btn capture-btn--js"><span></span>Capture</button>
         </div>
       </div>
     </div>
 
     <script src="js/bundle.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-115900319-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-115900319-1');
-    </script>
+   
   </body>
 </html>
