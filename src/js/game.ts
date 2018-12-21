@@ -67,7 +67,7 @@ export class Game {
             let test = this.resultObj[key].reduce((accumulator: number, currentValue: number) => accumulator + currentValue);
             let average = (Number(test) / this.resultObj[key].length);
             //todo: fix up this confidence depending on the objects and their relative complexities.
-            if (average > 0.94) {
+            if (average > 0.90) {
                 this.objects.map((el) => {
                     if (el.name === key) {
                         this.foundObject = el;
@@ -113,7 +113,7 @@ export class Game {
       // This call retrieves the topK matches from our MobileNet for the
       // provided image data.
       const topK =
-          await this.objectScavengerMobileNet.getTopKClasses(result, 2);
+          await this.objectScavengerMobileNet.getTopKClasses(result, 5);
 
       // Match the top 2 matches against our current active emoji.
       for (const item of topK) {

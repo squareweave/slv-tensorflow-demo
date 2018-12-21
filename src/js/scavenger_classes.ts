@@ -17,6 +17,8 @@
  */
 export const SCAVENGER_CLASSES: {[key: number]: string} = {
     0: 'pig',
-    1: 'keyboard',
+    1: 'remote',
+    2: 'coffee cup',
+    3: 'tea box',
 }
     

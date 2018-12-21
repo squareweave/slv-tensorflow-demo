@@ -25,6 +25,12 @@ export const OBJECTS: Array<ExhibitItem> = [
     'name': 'pig',
   },
   {
-    'name': 'keyboard',
+    'name': 'coffee cup',
+  },
+  {
+    'name': 'remote',
+  },
+  {
+    'name': 'tea box',
   },
 ]; 
