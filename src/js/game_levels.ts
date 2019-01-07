@@ -22,15 +22,15 @@ export interface ExhibitItem {
 
 export const OBJECTS: Array<ExhibitItem> = [
   {
+    'name': 'remote',
+  },
+  {
+    'name': 'bmo',
+  },
+  { 
     'name': 'pig',
   },
   {
     'name': 'coffee cup',
-  },
-  {
-    'name': 'remote',
-  },
-  {
-    'name': 'tea box',
   },
 ]; 
